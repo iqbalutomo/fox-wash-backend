@@ -1,0 +1,1 @@
+![Fox Wash Logo](assets/foxwash-logo.png)

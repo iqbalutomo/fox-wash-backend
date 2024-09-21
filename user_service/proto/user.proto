@@ -9,6 +9,7 @@ option go_package = "/pb";
 service User {
     rpc Register(RegisterRequest) returns(RegisterResponse);
     rpc VerifyNewUser(UserCredential) returns(google.protobuf.Empty);
+    rpc GetUser(EmailRequest) returns(UserData);
 }
 
 message RegisterRequest {
@@ -28,3 +29,15 @@ message UserCredential {
     string token = 2;
 }
 
+message EmailRequest {
+    string email = 1;
+}
+
+message UserData {
+    uint32 id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string password = 5;
+    bool is_verified = 6;
+}

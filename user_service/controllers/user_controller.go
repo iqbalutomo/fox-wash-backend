@@ -92,3 +92,21 @@ func (s *Server) VerifyNewUser(ctx context.Context, data *pb.UserCredential) (*e
 
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Server) GetUser(ctx context.Context, data *pb.EmailRequest) (*pb.UserData, error) {
+	user, err := s.repo.GetUser(data.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	userData := &pb.UserData{
+		Id:         uint32(user.ID),
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		Email:      user.Email,
+		Password:   user.Password,
+		IsVerified: user.IsVerified,
+	}
+
+	return userData, nil
+}

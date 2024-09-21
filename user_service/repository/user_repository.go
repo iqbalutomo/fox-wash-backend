@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+	"user_service/dto"
 	"user_service/models"
 
 	"google.golang.org/grpc/codes"
@@ -9,9 +11,10 @@ import (
 )
 
 type User interface {
-	CreateUser(*models.User) error
-	AddToken(*models.EmailVerification) error
+	CreateUser(data *models.User) error
+	AddToken(data *models.EmailVerification) error
 	VerifyNewUser(id uint32, token string) error
+	GetUser(email string) (dto.UserJoinedData, error)
 }
 
 type UserRepository struct {
@@ -62,4 +65,23 @@ func (u *UserRepository) VerifyNewUser(userID uint32, token string) error {
 	}
 
 	return nil
+}
+
+func (u *UserRepository) GetUser(email string) (dto.UserJoinedData, error) {
+	var userData dto.UserJoinedData
+
+	result := u.db.Table("users u").
+		Select("u.id, u.first_name, u.last_name, u.email, u.password, u.created_at, v.is_verified").
+		Where("u.email = ?", email).
+		Joins("JOIN email_verifications v ON v.user_id = u.id").
+		Take(&userData)
+	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dto.UserJoinedData{}, status.Error(codes.NotFound, err.Error())
+		}
+
+		return userData, status.Error(codes.Internal, err.Error())
+	}
+
+	return userData, nil
 }

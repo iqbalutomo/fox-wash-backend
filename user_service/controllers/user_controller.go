@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"time"
 	"user_service/dto"
 	"user_service/helpers"
@@ -13,6 +14,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Server struct {
@@ -46,6 +48,20 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 		return nil, err
 	}
 
+	tokenVerify, err := helpers.GenerateTokenVerify()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	verificationData := models.EmailVerification{
+		UserID: newUser.ID,
+		Token:  tokenVerify,
+	}
+
+	if err := s.repo.AddToken(&verificationData); err != nil {
+		return nil, err
+	}
+
 	dataJsonRequest := dto.UserMessageBroker{
 		ID:    newUser.ID,
 		Name:  newUser.FirstName,
@@ -67,4 +83,12 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 	}
 
 	return response, nil
+}
+
+func (s *Server) VerifyNewUser(ctx context.Context, data *pb.UserCredential) (*emptypb.Empty, error) {
+	if err := s.repo.VerifyNewUser(data.Id, data.Token); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

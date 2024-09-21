@@ -8,3 +8,9 @@ type User struct {
 	Password  string `json:"password" gorm:"not null"`
 	CreatedAt string `json:"created_at" gorm:"not null;type:timestamp"`
 }
+
+type EmailVerification struct {
+	UserID     uint   `json:"user_id" gorm:"primaryKey"`
+	Token      string `json:"token" gorm:"not null"`
+	IsVerified bool   `json:"is_verified" gorm:"default:false"`
+}

@@ -31,16 +31,11 @@ func NewUserController(repo repository.User, mb services.MessageBroker) *Server 
 }
 
 func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	hashedPassword, err := helpers.HashingPassword(data.Password)
-	if err != nil {
-		return nil, err
-	}
-
 	newUser := models.User{
 		FirstName: data.FirstName,
 		LastName:  data.LastName,
 		Email:     data.Email,
-		Password:  hashedPassword,
+		Password:  data.Password,
 		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
@@ -66,6 +61,7 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 		ID:    newUser.ID,
 		Name:  newUser.FirstName,
 		Email: newUser.Email,
+		Token: verificationData.Token,
 	}
 
 	dataJson, err := json.Marshal(dataJsonRequest)

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "/pb/userpb";
+
+service User {
+    rpc Register(RegisterRequest) returns(RegisterResponse);
+    rpc VerifyNewUser(UserCredential) returns(google.protobuf.Empty);
+    rpc GetUser(EmailRequest) returns(UserData);
+}
+
+message RegisterRequest {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+    string password = 4;
+}
+
+message RegisterResponse {
+    uint32 user_id = 1;
+    string created_at = 2;
+}
+
+message UserCredential {
+    uint32 id = 1;
+    string token = 2;
+}
+
+message EmailRequest {
+    string email = 1;
+}
+
+message UserData {
+    uint32 id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string password = 5;
+    bool is_verified = 6;
+}

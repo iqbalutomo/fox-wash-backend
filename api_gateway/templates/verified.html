@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1f1f1f;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+            text-align: center;
+        }
+        .container {
+            margin-top: 100px;
+        }
+        .logo {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+        h1 {
+            color: #E25D0E;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+            color: #dddddd;
+            margin-bottom: 30px;
+        }
+        /* Confetti animation */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: #E25D0E;
+            animation: confetti-fall 3s infinite;
+            opacity: 0;
+        }
+        @keyframes confetti-fall {
+            0% { opacity: 1; transform: translateY(-100%) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="../templates/assets/foxwash-logo.svg" alt="Company Logo">
+    </div>
+    <h1>Verification Successful!</h1>
+    <p>Congratulations, your email has been successfully verified. You can now proceed to login and use all the features.</p>
+</div>
+
+<!-- Confetti Effect -->
+<script>
+    const createConfetti = () => {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+            confetti.remove();
+        }, 5000);
+    };
+
+    setInterval(createConfetti, 300);
+</script>
+
+</body>
+</html>

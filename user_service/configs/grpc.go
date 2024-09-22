@@ -5,8 +5,10 @@ import (
 	"net"
 	"os"
 	"user_service/controllers"
+	"user_service/middlewares"
 	"user_service/pb"
 
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"google.golang.org/grpc"
 )
 
@@ -17,7 +19,11 @@ func ListenAndServeGrpc(controller controllers.Server) {
 		log.Fatal(err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grpc_auth.UnaryServerInterceptor(middlewares.JWTAuth),
+		),
+	)
 
 	pb.RegisterUserServer(grpcServer, &controller)
 

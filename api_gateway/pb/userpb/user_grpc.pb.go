@@ -23,6 +23,7 @@ const (
 	User_Register_FullMethodName      = "/user.User/Register"
 	User_VerifyNewUser_FullMethodName = "/user.User/VerifyNewUser"
 	User_GetUser_FullMethodName       = "/user.User/GetUser"
+	User_CreateWasher_FullMethodName  = "/user.User/CreateWasher"
 )
 
 // UserClient is the client API for User service.
@@ -32,6 +33,7 @@ type UserClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	VerifyNewUser(ctx context.Context, in *UserCredential, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUser(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*UserData, error)
+	CreateWasher(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -72,6 +74,16 @@ func (c *userClient) GetUser(ctx context.Context, in *EmailRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *userClient) CreateWasher(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_CreateWasher_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations should embed UnimplementedUserServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type UserServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	VerifyNewUser(context.Context, *UserCredential) (*emptypb.Empty, error)
 	GetUser(context.Context, *EmailRequest) (*UserData, error)
+	CreateWasher(context.Context, *WasherID) (*emptypb.Empty, error)
 }
 
 // UnimplementedUserServer should be embedded to have
@@ -96,6 +109,9 @@ func (UnimplementedUserServer) VerifyNewUser(context.Context, *UserCredential) (
 }
 func (UnimplementedUserServer) GetUser(context.Context, *EmailRequest) (*UserData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUserServer) CreateWasher(context.Context, *WasherID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateWasher not implemented")
 }
 func (UnimplementedUserServer) testEmbeddedByValue() {}
 
@@ -171,6 +187,24 @@ func _User_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_CreateWasher_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WasherID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CreateWasher(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CreateWasher_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CreateWasher(ctx, req.(*WasherID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -189,6 +223,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _User_GetUser_Handler,
+		},
+		{
+			MethodName: "CreateWasher",
+			Handler:    _User_CreateWasher_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

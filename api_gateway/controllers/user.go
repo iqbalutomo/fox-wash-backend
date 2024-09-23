@@ -23,7 +23,19 @@ func NewUserController(client userpb.UserClient) *UserController {
 	return &UserController{client}
 }
 
-func (u *UserController) Register(c echo.Context) error {
+func (u *UserController) UserRegister(c echo.Context) error {
+	return u.Register(c, utils.UserRoleID, utils.UserRole)
+}
+
+func (u *UserController) WasherRegister(c echo.Context) error {
+	return u.Register(c, utils.WasherRoleID, utils.WasherRole)
+}
+
+func (u *UserController) AdminRegister(c echo.Context) error {
+	return u.Register(c, utils.AdminRoleID, utils.AdminRole)
+}
+
+func (u *UserController) Register(c echo.Context, roleID uint, roleName string) error {
 	register := new(dto.UserRegister)
 	if err := c.Bind(register); err != nil {
 		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
@@ -43,6 +55,7 @@ func (u *UserController) Register(c echo.Context) error {
 		LastName:  register.LastName,
 		Email:     register.Email,
 		Password:  string(hashedPassword),
+		RoleId:    uint32(roleID),
 	}
 
 	ctx, cancel, err := helpers.NewServiceContext()
@@ -65,11 +78,24 @@ func (u *UserController) Register(c echo.Context) error {
 		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
 	}
 
+	if roleName == utils.WasherRole {
+		ctx, cancel, err := helpers.NewServiceContext()
+		if err != nil {
+			return err
+		}
+		defer cancel()
+
+		if _, err := u.client.CreateWasher(ctx, &userpb.WasherID{Id: responseGrpc.UserId}); err != nil {
+			return utils.AssertGrpcStatus(err)
+		}
+	}
+
 	responseData := models.User{
 		ID:        uint(responseGrpc.UserId),
 		FirstName: register.FirstName,
 		LastName:  register.LastName,
 		Email:     register.Email,
+		Role:      roleName,
 		CreatedAt: responseGrpc.CreatedAt,
 	}
 

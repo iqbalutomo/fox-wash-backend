@@ -36,6 +36,7 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 		LastName:  data.LastName,
 		Email:     data.Email,
 		Password:  data.Password,
+		RoleID:    data.RoleId,
 		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
@@ -105,4 +106,12 @@ func (s *Server) GetUser(ctx context.Context, data *pb.EmailRequest) (*pb.UserDa
 	}
 
 	return userData, nil
+}
+
+func (s *Server) CreateWasher(ctx context.Context, data *pb.WasherID) (*emptypb.Empty, error) {
+	if err := s.repo.CreateWasher(data.Id); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

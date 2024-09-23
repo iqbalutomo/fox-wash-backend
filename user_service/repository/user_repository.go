@@ -4,6 +4,7 @@ import (
 	"errors"
 	"user_service/dto"
 	"user_service/models"
+	"user_service/utils"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,6 +16,7 @@ type User interface {
 	AddToken(data *models.EmailVerification) error
 	VerifyNewUser(id uint32, token string) error
 	GetUser(email string) (dto.UserJoinedData, error)
+	CreateWasher(userID uint32) error
 }
 
 type UserRepository struct {
@@ -84,4 +86,19 @@ func (u *UserRepository) GetUser(email string) (dto.UserJoinedData, error) {
 	}
 
 	return userData, nil
+}
+
+func (u *UserRepository) CreateWasher(userID uint32) error {
+	washerData := models.Washer{
+		UserID:         uint(userID),
+		IsActive:       false,
+		WasherStatusID: utils.InActiveWasherStatusID,
+	}
+
+	result := u.db.Create(&washerData)
+	if err := result.Error; err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
 }

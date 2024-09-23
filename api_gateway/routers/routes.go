@@ -2,6 +2,7 @@ package router
 
 import (
 	"api_gateway/controllers"
+	"api_gateway/middlewares"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -23,5 +24,11 @@ func Echo(e *echo.Echo, uc controllers.UserController) {
 		})
 
 		users.POST("/login", uc.Login)
+	}
+
+	admin := e.Group("/admins")
+	admin.Use(middlewares.Auth)
+	{
+		admin.GET("/washer-activation/:email", uc.WasherActivation)
 	}
 }

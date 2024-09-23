@@ -3,8 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
-	"user_service/migrates"
-	"user_service/models"
+	"wash_station_service/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,12 +16,9 @@ func ConnectDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect database: %v", err)
 	}
 
-	if err := db.AutoMigrate(&models.Role{}, &models.User{}, &models.EmailVerification{}, &models.WasherStatus{}, &models.Washer{}); err != nil {
+	if err := db.AutoMigrate(&models.Wash{}, &models.Detailing{}); err != nil {
 		return nil, fmt.Errorf("failed to migrating database: %v", err)
 	}
-
-	migrates.SeedRoles(db)
-	migrates.SeedWasherStatuses(db)
 
 	return db, nil
 }

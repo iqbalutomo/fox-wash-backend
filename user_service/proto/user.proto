@@ -11,6 +11,9 @@ service User {
     rpc VerifyNewUser(UserCredential) returns(google.protobuf.Empty);
     rpc GetUser(EmailRequest) returns(UserData);
     rpc CreateWasher(WasherID) returns(google.protobuf.Empty);
+    rpc WasherActivation(EmailRequest) returns(google.protobuf.Empty);
+    rpc GetWasher(WasherID) returns(WasherData);
+    rpc SetWasherStatusOnline(WasherID) returns(google.protobuf.Empty);
 }
 
 message RegisterRequest {
@@ -47,4 +50,11 @@ message UserData {
 
 message WasherID {
     uint32 id = 1;
+}
+
+message WasherData {
+    uint32 user_id = 1;
+    bool is_online = 2;
+    uint32 washer_status_id = 3;
+    bool is_active = 4;
 }

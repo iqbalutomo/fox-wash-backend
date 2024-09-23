@@ -2,8 +2,9 @@ package models
 
 type Washer struct {
 	UserID         uint `gorm:"primaryKey"`
-	IsActive       bool `gorm:"not null"`
+	IsOnline       bool `gorm:"not null"`
 	WasherStatusID uint `gorm:"not null"`
+	IsActive       bool `gorm:"not null"`
 }
 
 type WasherStatus struct {

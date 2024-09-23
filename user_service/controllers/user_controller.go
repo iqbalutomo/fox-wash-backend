@@ -36,6 +36,7 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 		LastName:  data.LastName,
 		Email:     data.Email,
 		Password:  data.Password,
+		RoleID:    data.RoleId,
 		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
@@ -101,8 +102,51 @@ func (s *Server) GetUser(ctx context.Context, data *pb.EmailRequest) (*pb.UserDa
 		LastName:   user.LastName,
 		Email:      user.Email,
 		Password:   user.Password,
+		Role:       user.Role,
 		IsVerified: user.IsVerified,
 	}
 
 	return userData, nil
+}
+
+func (s *Server) CreateWasher(ctx context.Context, data *pb.WasherID) (*emptypb.Empty, error) {
+	if err := s.repo.CreateWasher(data.Id); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Server) WasherActivation(ctx context.Context, data *pb.EmailRequest) (*emptypb.Empty, error) {
+	if err := s.repo.WasherActivation(data.Email); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Server) GetWasher(ctx context.Context, data *pb.WasherID) (*pb.WasherData, error) {
+	washer, err := s.repo.GetWasher(int32(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	washerData := &pb.WasherData{
+		UserId:         uint32(washer.UserID),
+		IsOnline:       washer.IsOnline,
+		WasherStatusId: uint32(washer.WasherStatusID),
+		IsActive:       washer.IsActive,
+	}
+
+	return washerData, nil
+}
+
+func (s *Server) SetWasherStatusOnline(ctx context.Context, data *pb.WasherID) (*emptypb.Empty, error) {
+	washerID := data.Id
+
+	if err := s.repo.SetWasherStatusOnline(washerID); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

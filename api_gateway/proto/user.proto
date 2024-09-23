@@ -10,6 +10,10 @@ service User {
     rpc Register(RegisterRequest) returns(RegisterResponse);
     rpc VerifyNewUser(UserCredential) returns(google.protobuf.Empty);
     rpc GetUser(EmailRequest) returns(UserData);
+    rpc CreateWasher(WasherID) returns(google.protobuf.Empty);
+    rpc WasherActivation(EmailRequest) returns(google.protobuf.Empty);
+    rpc GetWasher(WasherID) returns(WasherData);
+    rpc SetWasherStatusOnline(WasherID) returns(google.protobuf.Empty);
 }
 
 message RegisterRequest {
@@ -17,6 +21,7 @@ message RegisterRequest {
     string last_name = 2;
     string email = 3;
     string password = 4;
+    uint32 role_id = 5;
 }
 
 message RegisterResponse {
@@ -39,5 +44,17 @@ message UserData {
     string last_name = 3;
     string email = 4;
     string password = 5;
-    bool is_verified = 6;
+    string role = 6;
+    bool is_verified = 7;
+}
+
+message WasherID {
+    uint32 id = 1;
+}
+
+message WasherData {
+    uint32 user_id = 1;
+    bool is_online = 2;
+    uint32 washer_status_id = 3;
+    bool is_active = 4;
 }

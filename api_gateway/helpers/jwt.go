@@ -16,8 +16,9 @@ func SignNewJWT(c echo.Context, user models.User) error {
 	claims := jwt.MapClaims{
 		"exp":   time.Now().Add(4 * time.Hour).Unix(),
 		"id":    user.ID,
-		"email": user.Email,
 		"name":  user.FirstName,
+		"email": user.Email,
+		"role":  user.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

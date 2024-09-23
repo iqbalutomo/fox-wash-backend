@@ -3,6 +3,8 @@ package controllers
 import (
 	"context"
 	"errors"
+	"time"
+	"wash_station_service/models"
 	"wash_station_service/pb"
 	"wash_station_service/repository"
 
@@ -19,7 +21,19 @@ func NewWashStationController(repo repository.WashStation) *Server {
 }
 
 func (s *Server) CreateWashPackage(ctx context.Context, data *pb.NewWashPackageData) (*pb.CreateWashPackageResponse, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackageData := models.Wash{
+		Name:      data.Name,
+		Category:  data.Category,
+		Price:     float64(data.Price),
+		CreatedBy: data.CreatedBy,
+		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	if err := s.repo.CreateWashPackage(&washPackageData); err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateWashPackageResponse{Id: washPackageData.ID}, nil
 }
 
 func (s *Server) FindAllWashPackages(ctx context.Context, empty *emptypb.Empty) (*pb.WashPackageCompactRepeated, error) {

@@ -6,6 +6,8 @@ import (
 	"wash_station_service/models"
 	"wash_station_service/pb"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +28,11 @@ func NewWashStationRepository(db *gorm.DB) WashStation {
 }
 
 func (w *WashStationRepository) CreateWashPackage(data *models.Wash) error {
-	return errors.New("") // TODO: logic here
+	if err := w.db.Create(data).Error; err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
 }
 
 func (w *WashStationRepository) FindAllWashPackages() ([]models.Wash, error) {

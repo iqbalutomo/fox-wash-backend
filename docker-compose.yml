@@ -41,6 +41,19 @@ services:
       MAILTRAP_API_URL: ${MAILTRAP_API_URL}
       RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
       VERIFICATION_URL: localhost:8080/users/verify
+  
+  wash_station_service:
+    build: ./wash_station_service
+    container_name: wash_station_service
+    ports:
+      - "50052:50052"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 50052
+      SERVICES_JWT_SECRET: ${SERVICES_JWT_SECRET}
+      POSTGRES_URI: "user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} host=postgres port=5432 dbname=${POSTGRES_DB} sslmode=disable TimeZone=Asia/Jakarta"
 
   rabbitmq:
     image: rabbitmq:3-management

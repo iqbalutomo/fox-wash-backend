@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package wash_station;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "/pb/washstationpb";
+
+service WashStation {
+    // Admin
+    rpc CreateWashPackage(NewWashPackageData) returns(CreateWashPackageResponse);
+    rpc FindAllWashPackages(google.protobuf.Empty) returns(WashPackageCompactRepeated);
+    rpc FindWashPackageByID(WashPackageID) returns(WashPackageData);
+    rpc UpdateWashPackage(UpdateWashPackageData) returns(google.protobuf.Empty);
+    rpc DeleteWashPackage(WashPackageID) returns(google.protobuf.Empty);
+}
+
+message NewWashPackageData {
+    string name = 1;
+    uint32 category = 2; // cc motorbike
+    float price = 3;
+    uint32 created_by = 4; // admin_id
+}
+
+message CreateWashPackageResponse {
+    uint32 id = 1;
+    string created_at = 2;
+}
+
+message WashPackageCompactRepeated {
+    repeated WashPackageCompact wash_packages = 1;
+}
+
+message WashPackageCompact {
+    uint32 id = 1;
+    string name = 2;
+    uint32 category = 3;
+    float price = 4;
+}
+
+message WashPackageID {
+    uint32 id = 1;
+}
+
+message WashPackageData {
+    uint32 id = 1;
+    string name = 2;
+    uint32 category = 3;
+    float price = 4;
+}
+
+message UpdateWashPackageData {
+    uint32 id = 1;
+    string name = 2;
+    uint32 category = 3;
+    float price = 4;
+    uint32 created_by = 5;
+}

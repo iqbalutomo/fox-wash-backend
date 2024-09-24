@@ -22,11 +22,10 @@ service WashStation {
 }
 
 message NewWashPackageData {
-    uint32 id = 1;
-    string name = 2;
-    uint32 category = 3; // cc bike
-    float price = 4;
-    uint32 created_by = 5; // admin_id
+    string name = 1;
+    uint32 category = 2; // cc motorbike
+    float price = 3;
+    uint32 created_by = 4; // admin_id
 }
 
 message CreateWashPackageResponse {

@@ -74,6 +74,30 @@ func (s *Server) FindWashPackageByID(ctx context.Context, data *pb.WashPackageID
 	return washPackage, nil
 }
 
+func (s *Server) FindMultipleWashPackages(ctx context.Context, data *pb.WashPackageIDs) (*pb.WashPackageCompactRepeated, error) {
+	washPackageIDs := data.GetIds()
+	washPackages, err := s.repo.FindMultipleWashPackages(washPackageIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var washPackageDatas []*pb.WashPackageCompact
+	for _, wash := range washPackages {
+		washPackageDatas = append(washPackageDatas, &pb.WashPackageCompact{
+			Id:       wash.Id,
+			Name:     wash.Name,
+			Category: wash.Category,
+			Price:    wash.Price,
+		})
+	}
+
+	response := &pb.WashPackageCompactRepeated{
+		WashPackages: washPackageDatas,
+	}
+
+	return response, nil
+}
+
 func (s *Server) UpdateWashPackage(ctx context.Context, data *pb.UpdateWashPackageData) (*emptypb.Empty, error) {
 	washPackageTmp, err := s.repo.FindWashPackageByID(data.Id)
 	if err != nil {

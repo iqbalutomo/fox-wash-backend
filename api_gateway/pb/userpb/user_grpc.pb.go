@@ -27,6 +27,7 @@ const (
 	User_WasherActivation_FullMethodName      = "/user.User/WasherActivation"
 	User_GetWasher_FullMethodName             = "/user.User/GetWasher"
 	User_SetWasherStatusOnline_FullMethodName = "/user.User/SetWasherStatusOnline"
+	User_GetAvailableWasher_FullMethodName    = "/user.User/GetAvailableWasher"
 )
 
 // UserClient is the client API for User service.
@@ -40,6 +41,7 @@ type UserClient interface {
 	WasherActivation(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetWasher(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*WasherData, error)
 	SetWasherStatusOnline(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAvailableWasher(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WasherOrderData, error)
 }
 
 type userClient struct {
@@ -120,6 +122,16 @@ func (c *userClient) SetWasherStatusOnline(ctx context.Context, in *WasherID, op
 	return out, nil
 }
 
+func (c *userClient) GetAvailableWasher(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WasherOrderData, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WasherOrderData)
+	err := c.cc.Invoke(ctx, User_GetAvailableWasher_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations should embed UnimplementedUserServer
 // for forward compatibility.
@@ -131,6 +143,7 @@ type UserServer interface {
 	WasherActivation(context.Context, *EmailRequest) (*emptypb.Empty, error)
 	GetWasher(context.Context, *WasherID) (*WasherData, error)
 	SetWasherStatusOnline(context.Context, *WasherID) (*emptypb.Empty, error)
+	GetAvailableWasher(context.Context, *emptypb.Empty) (*WasherOrderData, error)
 }
 
 // UnimplementedUserServer should be embedded to have
@@ -160,6 +173,9 @@ func (UnimplementedUserServer) GetWasher(context.Context, *WasherID) (*WasherDat
 }
 func (UnimplementedUserServer) SetWasherStatusOnline(context.Context, *WasherID) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWasherStatusOnline not implemented")
+}
+func (UnimplementedUserServer) GetAvailableWasher(context.Context, *emptypb.Empty) (*WasherOrderData, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableWasher not implemented")
 }
 func (UnimplementedUserServer) testEmbeddedByValue() {}
 
@@ -307,6 +323,24 @@ func _User_SetWasherStatusOnline_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetAvailableWasher_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetAvailableWasher(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetAvailableWasher_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetAvailableWasher(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -341,6 +375,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetWasherStatusOnline",
 			Handler:    _User_SetWasherStatusOnline_Handler,
+		},
+		{
+			MethodName: "GetAvailableWasher",
+			Handler:    _User_GetAvailableWasher_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

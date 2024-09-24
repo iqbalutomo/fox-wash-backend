@@ -15,6 +15,7 @@ type WashStation interface {
 	CreateWashPackage(data *models.Wash) error
 	FindAllWashPackages() ([]models.Wash, error)
 	FindWashPackageByID(WashPackageID uint32) (dto.WashPackageDataCompact, error)
+	FindMultipleWashPackages(WashPackageIDs []uint32) ([]*pb.WashPackageCompact, error)
 	UpdateWashPackage(WashPackageID uint32, data *pb.UpdateWashPackageData) error
 	DeleteWashPackage(WashPackageID uint32) error
 	//detailingpackagemethods
@@ -63,6 +64,21 @@ func (w *WashStationRepository) FindWashPackageByID(WashPackageID uint32) (dto.W
 	}
 
 	return washPackage, nil
+}
+
+func (w *WashStationRepository) FindMultipleWashPackages(WashPackageIDs []uint32) ([]*pb.WashPackageCompact, error) {
+	var washPackages []*pb.WashPackageCompact
+
+	res := w.db.Table("washes").Select("id, name, category, price").Where("id IN ?", WashPackageIDs).Order("id").Scan(&washPackages)
+	if err := res.Error; err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if res.RowsAffected != int64(len(WashPackageIDs)) {
+		return nil, status.Error(codes.InvalidArgument, "Invalid wash package ID")
+	}
+
+	return washPackages, nil
 }
 
 func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb.UpdateWashPackageData) error {

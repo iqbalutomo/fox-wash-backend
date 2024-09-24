@@ -33,9 +33,8 @@ func ConvertOrderToResponsePb(orderData models.Order) *orderpb.CreateOrderRespon
 			Method:     orderData.Payment.Method,
 			Status:     orderData.Payment.Status,
 		},
-		Status:      utils.OrderStatusPendingPayment,
-		VoucherCode: "",
-		CreatedAt:   orderData.CreatedAt.Time().String(),
+		Status:    utils.OrderStatusPendingPayment,
+		CreatedAt: orderData.CreatedAt.Time().String(),
 	}
 }
 

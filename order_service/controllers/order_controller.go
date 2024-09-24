@@ -10,6 +10,7 @@ import (
 	"order_service/pb/washstationpb"
 	"order_service/repository"
 	"order_service/services"
+	"order_service/utils"
 	"os"
 	"strconv"
 	"time"
@@ -66,7 +67,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	defer cancel()
 
 	ctxWithAuth := grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token)
-	orderItems, err := o.CalculateOrder(ctxWithAuth, washPackageItems, data.VoucherCode)
+	orderItems, err := o.CalculateOrder(ctxWithAuth, washPackageItems)
 	if err != nil {
 		return nil, err
 	}
@@ -99,13 +100,15 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 			AppFee:           orderItems.AppFee,
 			TotalPrice:       orderItems.TotalPrice,
 		},
-		User:        userData,
-		Washer:      washerData,
-		Address:     models.Address{},
-		Payment:     paymentData,
-		Status:      "",
-		VoucherCode: "",
-		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
+		User:   userData,
+		Washer: washerData,
+		Address: models.Address{
+			Latitude:  data.Address.Latitude,
+			Longitude: data.Address.Longitude,
+		},
+		Payment:   paymentData,
+		Status:    utils.OrderStatusPendingPayment,
+		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}
 
 	ctx, cancel = context.WithTimeout(context.Background(), 20*time.Second)
@@ -120,7 +123,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	return response, nil
 }
 
-func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.WashPackageItem, voucherCode string) (dto.OrderCalculateResponse, error) {
+func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.WashPackageItem) (dto.OrderCalculateResponse, error) {
 	fee, err := strconv.ParseFloat(os.Getenv("APP_FEE"), 32)
 	if err != nil {
 		return dto.OrderCalculateResponse{}, err

@@ -10,7 +10,6 @@ type Order struct {
 	Address     Address            `bson:"address" json:"address"`
 	Payment     Payment            `bson:"payment" json:"payment"`
 	Status      string             `bson:"status" json:"status"`
-	VoucherCode string             `bson:"voucher_code" json:"voucher_code"`
 	CreatedAt   primitive.DateTime `bson:"created_at" json:"created_at"`
 }
 

@@ -76,7 +76,16 @@ func (s *Server) FindWashPackageByID(ctx context.Context, data *pb.WashPackageID
 }
 
 func (s *Server) UpdateWashPackage(ctx context.Context, data *pb.UpdateWashPackageData) (*emptypb.Empty, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackageTmp, err := s.repo.FindWashPackageByID(data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.repo.UpdateWashPackage(washPackageTmp.ID, data); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
 func (s *Server) DeleteWashPackage(ctx context.Context, washPackageID *pb.WashPackageID) (*emptypb.Empty, error) {

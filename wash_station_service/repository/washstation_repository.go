@@ -60,7 +60,22 @@ func (w *WashStationRepository) FindWashPackageByID(WashPackageID uint32) (dto.W
 }
 
 func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb.UpdateWashPackageData) error {
-	return errors.New("") // TODO: logic here
+	washPackage := models.Wash{ID: WashPackageID}
+
+	res := w.db.Model(&washPackage).Updates(models.Wash{
+		Name:     data.Name,
+		Category: data.Category,
+		Price:    float64(data.Price),
+	})
+	if err := res.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return status.Error(codes.NotFound, err.Error())
+		}
+
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
 }
 
 func (w *WashStationRepository) DeleteWashPackage(WashPackageID uint32) error {

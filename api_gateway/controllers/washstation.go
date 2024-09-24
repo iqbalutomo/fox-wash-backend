@@ -75,7 +75,7 @@ func (w *WashStationController) CreateWashPackage(c echo.Context) error {
 func (w *WashStationController) GetAllWashPackages(c echo.Context) error {
 	ctx, cancel, err := helpers.NewServiceContext()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
 	}
 	defer cancel()
 
@@ -98,7 +98,7 @@ func (w *WashStationController) GetWashPackageByID(c echo.Context) error {
 
 	ctx, cancel, err := helpers.NewServiceContext()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
 	}
 	defer cancel()
 
@@ -110,5 +110,60 @@ func (w *WashStationController) GetWashPackageByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: fmt.Sprintf("Get wash package by %d", washPackageID),
 		Data:    washPackageData,
+	})
+}
+
+func (w *WashStationController) UpdateWashPackage(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.AdminRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	var washPackageUpdate dto.UpdateWashPackageData
+	washPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	if err := c.Bind(&washPackageUpdate); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	if err := c.Validate(&washPackageUpdate); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	pbUpdateWashPackage := &washstationpb.UpdateWashPackageData{
+		Id:       uint32(washPackageID),
+		Name:     washPackageUpdate.Name,
+		Category: washPackageUpdate.Category,
+		Price:    float32(washPackageUpdate.Price),
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	if _, err := w.client.UpdateWashPackage(ctx, pbUpdateWashPackage); err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	resp := dto.UpdateWashPackageResponse{
+		ID:        pbUpdateWashPackage.Id,
+		Name:      pbUpdateWashPackage.Name,
+		Category:  pbUpdateWashPackage.Category,
+		Price:     float64(pbUpdateWashPackage.Price),
+		CreatedBy: uint32(user.ID),
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Wash package has been updated!",
+		Data:    resp,
 	})
 }

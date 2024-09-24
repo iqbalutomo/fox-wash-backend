@@ -5,6 +5,8 @@ import (
 	config "wash_station_service/configs"
 	"wash_station_service/controllers"
 	"wash_station_service/repository"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {

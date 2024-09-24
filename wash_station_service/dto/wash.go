@@ -6,3 +6,10 @@ type WashPackageDataCompact struct {
 	Category uint32
 	Price    float64
 }
+
+type DetailingPackageDataCompact struct {
+	ID          uint32
+	Name        string
+	Description string
+	Price       float64
+}

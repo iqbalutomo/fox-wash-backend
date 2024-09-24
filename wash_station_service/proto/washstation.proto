@@ -13,6 +13,12 @@ service WashStation {
     rpc FindWashPackageByID(WashPackageID) returns(WashPackageData);
     rpc UpdateWashPackage(UpdateWashPackageData) returns(google.protobuf.Empty);
     rpc DeleteWashPackage(WashPackageID) returns(google.protobuf.Empty);
+    //detailing
+    rpc CreateDetailingPackage(NewDetailingPackageData) returns(CreateDetailingPackageResponse);
+    rpc FindAllDetailingPackages(google.protobuf.Empty) returns(DetailingPackageCompactRepeated);
+    rpc FindDetailingPackageByID(DetailingPackageID) returns(DetailingPackageData);
+    rpc UpdateDetailingPackage(UpdateDetailingPackageData) returns(google.protobuf.Empty);
+    rpc DeleteDetailingPackage(DetailingPackageID) returns(google.protobuf.Empty);
 }
 
 message NewWashPackageData {
@@ -53,6 +59,51 @@ message UpdateWashPackageData {
     uint32 id = 1;
     string name = 2;
     uint32 category = 3;
+    float price = 4;
+    uint32 created_by = 5;
+}
+
+// detailing package
+
+message NewDetailingPackageData {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3; // detailing package description
+    float price = 4;
+    uint32 created_by = 5; // admin_id
+}
+
+message CreateDetailingPackageResponse {
+    uint32 id = 1;
+    string created_at = 2;
+}
+
+message DetailingPackageCompactRepeated {
+    repeated DetailingPackageCompact detailing_packages = 1;
+}
+
+message DetailingPackageCompact {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    float price = 4;
+}
+
+message DetailingPackageID {
+    uint32 id = 1;
+}
+
+message DetailingPackageData {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    float price = 4;
+}
+
+message UpdateDetailingPackageData {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
     float price = 4;
     uint32 created_by = 5;
 }

@@ -9,6 +9,7 @@ services:
     environment:
       PORT: 8080
       USER_SERVICE_URI: user_service:50051
+      WASHSTATION_SERVICE_URI: wash_station_service:50052
       JWT_SECRET: ${JWT_SECRET}
       SERVICES_JWT_SECRET: ${SERVICES_JWT_SECRET}
   

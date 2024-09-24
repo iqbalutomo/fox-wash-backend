@@ -4,7 +4,7 @@
 // - protoc             v5.28.1
 // source: washstation.proto
 
-package pb
+package washstationpb
 
 import (
 	context "context"

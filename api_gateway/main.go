@@ -32,9 +32,13 @@ func main() {
 	userClientConn, userClient := config.InitUserServiceClient()
 	defer userClientConn.Close()
 
-	userController := controllers.NewUserController(userClient)
+	washstationClientConn, washstationClient := config.InitWashStationServiceClient()
+	defer washstationClientConn.Close()
 
-	router.Echo(e, *userController)
+	userController := controllers.NewUserController(userClient)
+	washstationController := controllers.NewWashStationController(washstationClient)
+
+	router.Echo(e, *userController, *washstationController)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

@@ -4,7 +4,7 @@ package wash_station;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "/pb";
+option go_package = "/pb/washstationpb";
 
 service WashStation {
     // Admin

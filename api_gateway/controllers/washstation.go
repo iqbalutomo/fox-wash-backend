@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type WashStationController struct {
@@ -66,5 +67,23 @@ func (w *WashStationController) CreateWashPackage(c echo.Context) error {
 	return c.JSON(http.StatusCreated, dto.Response{
 		Message: "Wash package has been created!",
 		Data:    response,
+	})
+}
+
+func (w *WashStationController) GetAllWashPackages(c echo.Context) error {
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return err
+	}
+	defer cancel()
+
+	washPackageData, err := w.client.FindAllWashPackages(ctx, &emptypb.Empty{})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Get all wash packages",
+		Data:    washPackageData,
 	})
 }

@@ -36,7 +36,13 @@ func (w *WashStationRepository) CreateWashPackage(data *models.Wash) error {
 }
 
 func (w *WashStationRepository) FindAllWashPackages() ([]models.Wash, error) {
-	return nil, errors.New("") // TODO: logic here
+	var washPackages []models.Wash
+
+	if err := w.db.Find(&washPackages).Error; err != nil {
+		return nil, err
+	}
+
+	return washPackages, nil
 }
 
 func (w *WashStationRepository) FindWashPackageByID(WashPackageID uint32) (dto.WashPackageDataCompact, error) {

@@ -37,7 +37,26 @@ func (s *Server) CreateWashPackage(ctx context.Context, data *pb.NewWashPackageD
 }
 
 func (s *Server) FindAllWashPackages(ctx context.Context, empty *emptypb.Empty) (*pb.WashPackageCompactRepeated, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackages, err := s.repo.FindAllWashPackages()
+	if err != nil {
+		return nil, err
+	}
+
+	var pbWashPackages []*pb.WashPackageCompact
+	for _, wash := range washPackages {
+		pbWashPackage := &pb.WashPackageCompact{
+			Id:       wash.ID,
+			Name:     wash.Name,
+			Category: wash.Category,
+			Price:    float32(wash.Price),
+		}
+
+		pbWashPackages = append(pbWashPackages, pbWashPackage)
+	}
+
+	return &pb.WashPackageCompactRepeated{
+		WashPackages: pbWashPackages,
+	}, nil
 }
 
 func (s *Server) FindWashPackageByID(ctx context.Context, washPackageID *pb.WashPackageID) (*pb.WashPackageData, error) {

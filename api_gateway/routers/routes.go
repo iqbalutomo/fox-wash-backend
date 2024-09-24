@@ -36,5 +36,6 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 	washstations.Use(middlewares.Auth)
 	{
 		washstations.POST("/wash-package", wc.CreateWashPackage)
+		washstations.GET("/wash-package/all", wc.GetAllWashPackages)
 	}
 }

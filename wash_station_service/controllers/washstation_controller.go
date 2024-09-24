@@ -154,9 +154,6 @@ func (s *Server) UpdateDetailingPackage(ctx context.Context, data *pb.UpdateDeta
 }
 
 func (s *Server) DeleteDetailingPackage(ctx context.Context, detailingPackageID *pb.DetailingPackageID) (*emptypb.Empty, error) {
-	if _, err := s.repo.FindDetailingPackageByID(detailingPackageID.Id); err != nil {
-		return nil, err
-	}
 	if err := s.repo.DeleteDetailingPackage(detailingPackageID.Id); err != nil {
 		return nil, err
 	}

@@ -59,8 +59,20 @@ func (s *Server) FindAllWashPackages(ctx context.Context, empty *emptypb.Empty) 
 	}, nil
 }
 
-func (s *Server) FindWashPackageByID(ctx context.Context, washPackageID *pb.WashPackageID) (*pb.WashPackageData, error) {
-	return nil, errors.New("") // TODO: logic here
+func (s *Server) FindWashPackageByID(ctx context.Context, data *pb.WashPackageID) (*pb.WashPackageData, error) {
+	result, err := s.repo.FindWashPackageByID(data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	washPackage := &pb.WashPackageData{
+		Id:       result.ID,
+		Name:     result.Name,
+		Category: result.Category,
+		Price:    float32(result.Price),
+	}
+
+	return washPackage, nil
 }
 
 func (s *Server) UpdateWashPackage(ctx context.Context, data *pb.UpdateWashPackageData) (*emptypb.Empty, error) {

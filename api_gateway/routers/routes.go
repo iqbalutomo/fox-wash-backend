@@ -37,5 +37,6 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 	{
 		washstations.POST("/wash-package", wc.CreateWashPackage)
 		washstations.GET("/wash-package/all", wc.GetAllWashPackages)
+		washstations.GET("/wash-package/:id", wc.GetWashPackageByID)
 	}
 }

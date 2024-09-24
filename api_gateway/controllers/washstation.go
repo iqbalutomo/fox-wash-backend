@@ -5,7 +5,9 @@ import (
 	"api_gateway/helpers"
 	washstationpb "api_gateway/pb/washstationpb"
 	"api_gateway/utils"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -84,6 +86,29 @@ func (w *WashStationController) GetAllWashPackages(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Get all wash packages",
+		Data:    washPackageData,
+	})
+}
+
+func (w *WashStationController) GetWashPackageByID(c echo.Context) error {
+	washPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return err
+	}
+	defer cancel()
+
+	washPackageData, err := w.client.FindWashPackageByID(ctx, &washstationpb.WashPackageID{Id: uint32(washPackageID)})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: fmt.Sprintf("Get wash package by %d", washPackageID),
 		Data:    washPackageData,
 	})
 }

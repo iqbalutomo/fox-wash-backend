@@ -46,7 +46,17 @@ func (w *WashStationRepository) FindAllWashPackages() ([]models.Wash, error) {
 }
 
 func (w *WashStationRepository) FindWashPackageByID(WashPackageID uint32) (dto.WashPackageDataCompact, error) {
-	return dto.WashPackageDataCompact{}, errors.New("") // TODO: logic here
+	var washPackage dto.WashPackageDataCompact
+
+	if err := w.db.Table("washes").Where("id = ?", WashPackageID).Take(&washPackage).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dto.WashPackageDataCompact{}, status.Error(codes.NotFound, err.Error())
+		}
+
+		return dto.WashPackageDataCompact{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return washPackage, nil
 }
 
 func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb.UpdateWashPackageData) error {

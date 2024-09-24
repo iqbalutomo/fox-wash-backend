@@ -79,5 +79,20 @@ func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb
 }
 
 func (w *WashStationRepository) DeleteWashPackage(WashPackageID uint32) error {
-	return errors.New("") // TODO: logic here
+	washPackageData := models.Wash{ID: WashPackageID}
+
+	res := w.db.Delete(&washPackageData, "id = ?", WashPackageID)
+	if err := res.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return status.Error(codes.NotFound, err.Error())
+		}
+
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "invalid wash package ID")
+	}
+
+	return nil
 }

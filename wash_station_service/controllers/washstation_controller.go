@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"errors"
 	"time"
 	"wash_station_service/models"
 	"wash_station_service/pb"
@@ -88,6 +87,10 @@ func (s *Server) UpdateWashPackage(ctx context.Context, data *pb.UpdateWashPacka
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) DeleteWashPackage(ctx context.Context, washPackageID *pb.WashPackageID) (*emptypb.Empty, error) {
-	return nil, errors.New("") // TODO: logic here
+func (s *Server) DeleteWashPackage(ctx context.Context, data *pb.WashPackageID) (*emptypb.Empty, error) {
+	if err := s.repo.DeleteWashPackage(data.Id); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

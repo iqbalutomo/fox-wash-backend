@@ -126,7 +126,7 @@ func (w *WashStationController) UpdateWashPackage(c echo.Context) error {
 	var washPackageUpdate dto.UpdateWashPackageData
 	washPackageID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
 	}
 
 	if err := c.Bind(&washPackageUpdate); err != nil {
@@ -165,5 +165,36 @@ func (w *WashStationController) UpdateWashPackage(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Wash package has been updated!",
 		Data:    resp,
+	})
+}
+
+func (w *WashStationController) DeleteWashPackage(c echo.Context) error {
+	washPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.AdminRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	if _, err := w.client.DeleteWashPackage(ctx, &washstationpb.WashPackageID{Id: uint32(washPackageID)}); err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Wash package has been deleted!",
+		Data:    fmt.Sprintf("Wash package with ID %d", washPackageID),
 	})
 }

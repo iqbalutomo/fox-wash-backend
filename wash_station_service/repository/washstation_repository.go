@@ -15,6 +15,12 @@ type WashStation interface {
 	FindWashPackageByID(WashPackageID uint32) (dto.WashPackageDataCompact, error)
 	UpdateWashPackage(WashPackageID uint32, data *pb.UpdateWashPackageData) error
 	DeleteWashPackage(WashPackageID uint32) error
+	//detailingpackagemethods
+	CreateDetailingPackage(data *models.Detailing) error
+	FindAllDetailingPackages() ([]models.Detailing, error)
+	FindDetailingPackageByID(DetailingPackageID uint32) (dto.DetailingPackageDataCompact, error)
+	UpdateDetailingPackage(DetailingPackageID uint32, data *pb.UpdateDetailingPackageData) error
+	DeleteDetailingPackage(DetailingPackageID uint32) error
 }
 
 type WashStationRepository struct {
@@ -43,4 +49,48 @@ func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb
 
 func (w *WashStationRepository) DeleteWashPackage(WashPackageID uint32) error {
 	return errors.New("") // TODO: logic here
+}
+
+//detailing package repo
+
+func (w *WashStationRepository) CreateDetailingPackage(data *models.Detailing) error {
+	if err := w.db.Create(data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w *WashStationRepository) FindAllDetailingPackages() ([]models.Detailing, error) {
+	var detailing []models.Detailing
+	if err := w.db.Find(&detailing).Error; err != nil {
+		return nil, err
+	}
+	return detailing, nil
+}
+
+func (w *WashStationRepository) FindDetailingPackageByID(DetailingPackageID uint32) (dto.DetailingPackageDataCompact, error) {
+	var detailing models.Detailing
+	if err := w.db.First(&detailing, DetailingPackageID).Error; err != nil {
+		return dto.DetailingPackageDataCompact{}, err
+	}
+	return dto.DetailingPackageDataCompact{
+		ID:          detailing.ID,
+		Name:        detailing.Name,
+		Description: detailing.Description,
+		Price:       detailing.Price,
+	}, nil
+}
+
+func (w *WashStationRepository) UpdateDetailingPackage(DetailingPackageID uint32, data *pb.UpdateDetailingPackageData) error {
+	if err := w.db.Model(&models.Detailing{}).Where("id = ?", DetailingPackageID).Updates(data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w *WashStationRepository) DeleteDetailingPackage(DetailingPackageID uint32) error {
+	if err := w.db.Delete(&models.Detailing{}, DetailingPackageID).Error; err != nil {
+		return err
+	}
+	return nil
 }

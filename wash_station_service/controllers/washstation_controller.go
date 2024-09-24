@@ -147,9 +147,6 @@ func (s *Server) FindDetailingPackageByID(ctx context.Context, detailingPackageI
 }
 
 func (s *Server) UpdateDetailingPackage(ctx context.Context, data *pb.UpdateDetailingPackageData) (*emptypb.Empty, error) {
-	if _, err := s.repo.FindDetailingPackageByID(data.Id); err != nil {
-		return nil, err
-	}
 	if err := s.repo.UpdateDetailingPackage(data.Id, data); err != nil {
 		return nil, err
 	}

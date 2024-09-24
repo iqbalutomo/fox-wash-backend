@@ -2,12 +2,13 @@ package router
 
 import (
 	"api_gateway/controllers"
+	"api_gateway/middlewares"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Echo(e *echo.Echo, uc controllers.UserController) {
+func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStationController) {
 	users := e.Group("/users")
 	{
 		register := users.Group("/register")
@@ -23,5 +24,21 @@ func Echo(e *echo.Echo, uc controllers.UserController) {
 		})
 
 		users.POST("/login", uc.Login)
+	}
+
+	admin := e.Group("/admins")
+	admin.Use(middlewares.Auth)
+	{
+		admin.GET("/washer-activation/:email", uc.WasherActivation)
+	}
+
+	washstations := e.Group("/washstations")
+	washstations.Use(middlewares.Auth)
+	{
+		washstations.POST("/wash-package", wc.CreateWashPackage)
+		washstations.GET("/wash-package/all", wc.GetAllWashPackages)
+		washstations.GET("/wash-package/:id", wc.GetWashPackageByID)
+		washstations.PUT("/wash-package/:id", wc.UpdateWashPackage)
+		washstations.DELETE("/wash-package/:id", wc.DeleteWashPackage)
 	}
 }

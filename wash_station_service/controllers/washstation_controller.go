@@ -2,7 +2,8 @@ package controllers
 
 import (
 	"context"
-	"errors"
+	"time"
+	"wash_station_service/models"
 	"wash_station_service/pb"
 	"wash_station_service/repository"
 
@@ -19,21 +20,77 @@ func NewWashStationController(repo repository.WashStation) *Server {
 }
 
 func (s *Server) CreateWashPackage(ctx context.Context, data *pb.NewWashPackageData) (*pb.CreateWashPackageResponse, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackageData := models.Wash{
+		Name:      data.Name,
+		Category:  data.Category,
+		Price:     float64(data.Price),
+		CreatedBy: data.CreatedBy,
+		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	if err := s.repo.CreateWashPackage(&washPackageData); err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateWashPackageResponse{Id: washPackageData.ID}, nil
 }
 
 func (s *Server) FindAllWashPackages(ctx context.Context, empty *emptypb.Empty) (*pb.WashPackageCompactRepeated, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackages, err := s.repo.FindAllWashPackages()
+	if err != nil {
+		return nil, err
+	}
+
+	var pbWashPackages []*pb.WashPackageCompact
+	for _, wash := range washPackages {
+		pbWashPackage := &pb.WashPackageCompact{
+			Id:       wash.ID,
+			Name:     wash.Name,
+			Category: wash.Category,
+			Price:    float32(wash.Price),
+		}
+
+		pbWashPackages = append(pbWashPackages, pbWashPackage)
+	}
+
+	return &pb.WashPackageCompactRepeated{
+		WashPackages: pbWashPackages,
+	}, nil
 }
 
-func (s *Server) FindWashPackageByID(ctx context.Context, washPackageID *pb.WashPackageID) (*pb.WashPackageData, error) {
-	return nil, errors.New("") // TODO: logic here
+func (s *Server) FindWashPackageByID(ctx context.Context, data *pb.WashPackageID) (*pb.WashPackageData, error) {
+	result, err := s.repo.FindWashPackageByID(data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	washPackage := &pb.WashPackageData{
+		Id:       result.ID,
+		Name:     result.Name,
+		Category: result.Category,
+		Price:    float32(result.Price),
+	}
+
+	return washPackage, nil
 }
 
 func (s *Server) UpdateWashPackage(ctx context.Context, data *pb.UpdateWashPackageData) (*emptypb.Empty, error) {
-	return nil, errors.New("") // TODO: logic here
+	washPackageTmp, err := s.repo.FindWashPackageByID(data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.repo.UpdateWashPackage(washPackageTmp.ID, data); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) DeleteWashPackage(ctx context.Context, washPackageID *pb.WashPackageID) (*emptypb.Empty, error) {
-	return nil, errors.New("") // TODO: logic here
+func (s *Server) DeleteWashPackage(ctx context.Context, data *pb.WashPackageID) (*emptypb.Empty, error) {
+	if err := s.repo.DeleteWashPackage(data.Id); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

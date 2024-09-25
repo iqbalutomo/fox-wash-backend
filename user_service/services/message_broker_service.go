@@ -10,6 +10,7 @@ import (
 
 type MessageBroker interface {
 	PublishMessageVerification(message []byte) error
+	PublishMessagePaymentSuccess(message []byte) error
 }
 
 type RabbitMQ struct {
@@ -22,6 +23,10 @@ func NewMessageBroker(ch *amqp.Channel) MessageBroker {
 
 func (r *RabbitMQ) PublishMessageVerification(message []byte) error {
 	return r.PublishMessage("email_verification", message)
+}
+
+func (r *RabbitMQ) PublishMessagePaymentSuccess(message []byte) error {
+	return r.PublishMessage("email_payment_success", message)
 }
 
 func (r *RabbitMQ) PublishMessage(queueName string, message []byte) error {

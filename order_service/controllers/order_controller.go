@@ -66,11 +66,21 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		washPackageItems = append(washPackageItems, washTmp)
 	}
 
+	var detailingPackageItems []*orderpb.DetailingPackageItem
+	for _, detailing := range data.DetailingPackageItems {
+		detailingTmp := &orderpb.DetailingPackageItem{
+			Id:  detailing.Id,
+			Qty: detailing.Qty,
+		}
+
+		detailingPackageItems = append(detailingPackageItems, detailingTmp)
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
 	ctxWithAuth := grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token)
-	orderItems, err := o.CalculateOrder(ctxWithAuth, washPackageItems)
+	orderItems, err := o.CalculateOrder(ctxWithAuth, washPackageItems, detailingPackageItems)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +100,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		Status: availableWasher.Status,
 	}
 
-	paymentData, err := o.paymentService.CreateInvoice(newObjectID, orderItems.TotalPrice)
+	paymentData, err := o.paymentService.CreateInvoice(newObjectID, orderItems.TotalPrice, userData.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +115,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		ID: newObjectID,
 		OrderDetail: models.OrderDetail{
 			WashPackage:      orderItems.WashPackageItems,
-			DetailingPackage: nil,
+			DetailingPackage: orderItems.DetailingPackageItems,
 			AppFee:           orderItems.AppFee,
 			TotalPrice:       orderItems.TotalPrice,
 		},
@@ -173,26 +183,33 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	return response, nil
 }
 
-func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.WashPackageItem) (dto.OrderCalculateResponse, error) {
+func (o *OrderController) CalculateOrder(ctx context.Context, washPackageItems []*orderpb.WashPackageItem, detailingPackageItems []*orderpb.DetailingPackageItem) (dto.OrderCalculateResponse, error) {
 	fee, err := strconv.ParseFloat(os.Getenv("APP_FEE"), 32)
 	if err != nil {
 		return dto.OrderCalculateResponse{}, err
 	}
 
 	var (
-		washPackageIDs       []uint32
-		washPackageIDWithQty = map[uint32]uint32{}
-		totalPrice           float32
-		appFee               float32 = float32(fee)
+		washPackageIDs            []uint32
+		washPackageIDWithQty      = map[uint32]uint32{}
+		detailingPackageIDs       []uint32
+		detailingPackageIDWithQty = map[uint32]uint32{}
+		totalPrice                float32
+		appFee                    float32 = float32(fee)
 	)
 
-	for _, item := range items {
+	for _, item := range washPackageItems {
 		washPackageIDWithQty[item.Id] = item.Qty
 		washPackageIDs = append(washPackageIDs, item.Id)
+	}
+	for _, item := range detailingPackageItems {
+		detailingPackageIDWithQty[item.Id] = item.Qty
+		detailingPackageIDs = append(detailingPackageIDs, item.Id)
 	}
 
 	g, _ := errgroup.WithContext(ctx)
 	washPackageDatasChan := make(chan []*models.WashPackage, 1)
+	detailingPackageDatasChan := make(chan []*models.DetailingPackage, 1)
 
 	g.Go(func() error {
 		washPackageDatas, err := o.washstationService.FindMultipleWashPackages(ctx, &washstationpb.WashPackageIDs{Ids: washPackageIDs})
@@ -215,11 +232,33 @@ func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.W
 		return nil
 	})
 
+	g.Go(func() error {
+		detailingPackageDatas, err := o.washstationService.FindMultipleDetailingPackages(ctx, &washstationpb.DetailingPackageIDs{Ids: detailingPackageIDs})
+		if err != nil {
+			return err
+		}
+
+		var convertedDetailingPackages []*models.DetailingPackage
+		for _, dp := range detailingPackageDatas.DetailingPackages {
+			convertedDetailingPackages = append(convertedDetailingPackages, &models.DetailingPackage{
+				ID:          int(dp.Id),
+				Name:        dp.Name,
+				Description: dp.Description,
+				Price:       dp.Price,
+				Qty:         uint(detailingPackageIDWithQty[dp.Id]),
+			})
+		}
+
+		detailingPackageDatasChan <- convertedDetailingPackages
+		return nil
+	})
+
 	if err := g.Wait(); err != nil {
 		return dto.OrderCalculateResponse{}, err
 	}
 
 	close(washPackageDatasChan)
+	close(detailingPackageDatasChan)
 
 	var washPackageDatas []models.WashPackage
 	for _, wp := range <-washPackageDatasChan {
@@ -239,12 +278,31 @@ func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.W
 		washPackageDatas = append(washPackageDatas, wpData)
 	}
 
+	var detailingPackageDatas []models.DetailingPackage
+	for _, dp := range <-detailingPackageDatasChan {
+		quantity := detailingPackageIDWithQty[uint32(dp.ID)]
+		subtotal := math.Round(float64(dp.Price) * float64(quantity))
+		totalPrice += float32(subtotal)
+
+		dpData := models.DetailingPackage{
+			ID:          dp.ID,
+			Name:        dp.Name,
+			Description: dp.Description,
+			Price:       dp.Price,
+			Qty:         uint(quantity),
+			SubTotal:    float32(subtotal),
+		}
+
+		detailingPackageDatas = append(detailingPackageDatas, dpData)
+	}
+
 	totalPrice += appFee
 
 	response := dto.OrderCalculateResponse{
-		WashPackageItems: washPackageDatas,
-		AppFee:           appFee,
-		TotalPrice:       totalPrice,
+		WashPackageItems:      washPackageDatas,
+		DetailingPackageItems: detailingPackageDatas,
+		AppFee:                appFee,
+		TotalPrice:            totalPrice,
 	}
 
 	return response, nil

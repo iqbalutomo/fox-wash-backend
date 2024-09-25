@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Order Confirmation</title>
+    <title>Payment Successful</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -99,76 +99,18 @@
 <div class="container">
     <div class="email-box">
         <div class="header">
-            <h1>Order Confirmation</h1>
+            <h1>Payment Successful</h1>
         </div>
         <div class="content">
             <img src="https://iili.io/dL7ZDl9.png" alt="Logo" class="logo" />
-            <p>Hi <strong>{{ .User.Name }}</strong>,</p>
-            <p>Thank you for your order! Here are the details of your purchase:</p>
-
-            <h2>Order Details</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Package Type</th>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{ range .order_detail.WashPackage }}
-                    <tr>
-                        <td>Wash Package</td>
-                        <td>{{ .Name }}</td>
-                        <td>{{ .Qty }}</td>
-                        <td>{{ .Price }}</td>
-                        <td>{{ .SubTotal }}</td>
-                    </tr>
-                    {{ end }}
-
-                    {{ range .order_detail.DetailingPackage }}
-                    <tr>
-                        <td>Detailing Package</td>
-                        <td>{{ .Name }}</td>
-                        <td>{{ .Qty }}</td>
-                        <td>{{ .Price }}</td>
-                        <td>{{ .SubTotal }}</td>
-                    </tr>
-                    {{ end }}
-                    <tr>
-                        <td>App Fee</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>{{.order_detail.AppFee}}</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold;">Total Price</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td style="font-weight: bold;">{{.order_detail.TotalPrice}}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <p>Hi <strong>{{ .Name }}</strong>,</p>
+            <p>Your payment successfully! Your motorbike will be clean✨</p>
 
             <h2>Payment Information</h2>
-            <p><strong>Invoice ID:</strong> {{ .Payment.InvoiceID }}</p>
-            <p><strong>Payment Status:</strong> {{ .Payment.Status }}</p>
-            <div style="text-align: center;">
-                <a href="{{ .Payment.InvoiceURL }}" target="_blank" class="btn">Pay Now</a>
-                <hr>
-            </div>
-
-            <div style="text-align: center;">
-                <p>Click the button below to check the location of the motorbike wash address</p>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ .Address.Latitude }},{{ .Address.Longitude }}" target="_blank" class="btn">View on Google Maps</a>
-
-                <hr>
-                <p>If you have any questions, feel free to contact our support team.</p>
-            </div>
+            <p><strong>Invoice ID:</strong> {{ .InvoiceID }}</p>
+            <p><strong>Payment Method:</strong> {{ .Method }}</p>
+            <p><strong>Payment Status:</strong> {{ .Status }}</p>
+            <p><strong>Order Status:</strong> <b style="color: #E25D0E;">washer is preparing</b></p>
 
         </div>
         <div class="footer">

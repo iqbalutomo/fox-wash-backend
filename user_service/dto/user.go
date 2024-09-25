@@ -10,3 +10,12 @@ type UserJoinedData struct {
 	CreatedAt  string `json:"created_at"`
 	IsVerified bool   `json:"is_verified"`
 }
+
+type PaymentSuccessData struct {
+	InvoiceID   string `json:"invoice_id"`
+	Status      string `json:"status"`
+	Method      string `json:"method"`
+	CompletedAt string `json:"completed_at"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+}

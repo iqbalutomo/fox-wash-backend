@@ -16,11 +16,4 @@ const (
 	AvailableStatus         = "available"
 	WashingStatus           = "washing"
 	InActiveStatus          = "inactive"
-
-	// washer order status
-	PreparingOrderWasherStatusID = 1
-	OngoingOrderWasherStatusID   = 2
-	ArrivedOrderWasherStatusID   = 3
-	WashingOrderWasherStatusID   = 4
-	FinishedOrderWasherStatusID  = 5
 )

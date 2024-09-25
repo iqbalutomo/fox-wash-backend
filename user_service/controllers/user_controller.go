@@ -141,6 +141,21 @@ func (s *Server) GetWasher(ctx context.Context, data *pb.WasherID) (*pb.WasherDa
 	return washerData, nil
 }
 
+func (s *Server) GetAvailableWasher(ctx context.Context, data *emptypb.Empty) (*pb.WasherOrderData, error) {
+	washer, err := s.repo.GetAvailableWasher()
+	if err != nil {
+		return nil, err
+	}
+
+	washerData := &pb.WasherOrderData{
+		Id:     washer.ID,
+		Name:   washer.Name,
+		Status: washer.Status,
+	}
+
+	return washerData, nil
+}
+
 func (s *Server) SetWasherStatusOnline(ctx context.Context, data *pb.WasherID) (*emptypb.Empty, error) {
 	washerID := data.Id
 

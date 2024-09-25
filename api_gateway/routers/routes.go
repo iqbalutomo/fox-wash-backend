@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStationController) {
+func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStationController, oc controllers.OrderController) {
 	users := e.Group("/users")
 	{
 		register := users.Group("/register")
@@ -40,5 +40,19 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		washstations.GET("/wash-package/:id", wc.GetWashPackageByID)
 		washstations.PUT("/wash-package/:id", wc.UpdateWashPackage)
 		washstations.DELETE("/wash-package/:id", wc.DeleteWashPackage)
+	}
+
+	orders := e.Group("")
+	orders.Use(middlewares.Auth)
+	{
+		users := orders.Group("/users")
+		{
+			users.POST("/orders", oc.CreateOrder)
+		}
+	}
+
+	payments := e.Group("/payments")
+	{
+		payments.POST("/invoice", oc.UpdatePaymentStatus)
 	}
 }

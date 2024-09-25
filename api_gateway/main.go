@@ -4,6 +4,7 @@ import (
 	config "api_gateway/configs"
 	"api_gateway/controllers"
 	router "api_gateway/routers"
+	"api_gateway/services"
 	"api_gateway/utils"
 	"html/template"
 	"io"
@@ -35,10 +36,17 @@ func main() {
 	washstationClientConn, washstationClient := config.InitWashStationServiceClient()
 	defer washstationClientConn.Close()
 
+	orderClientConn, orderClient := config.InitOrderServiceClient()
+	defer orderClientConn.Close()
+
+	mapService := services.NewMapService()
+
 	userController := controllers.NewUserController(userClient)
 	washstationController := controllers.NewWashStationController(washstationClient)
 
-	router.Echo(e, *userController, *washstationController)
+	orderController := controllers.NewOrderController(orderClient, mapService)
+
+	router.Echo(e, *userController, *washstationController, *orderController)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

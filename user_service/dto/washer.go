@@ -6,3 +6,9 @@ type WasherData struct {
 	WasherStatusID uint32 `json:"washer_status_id"`
 	IsActive       bool   `json:"is_active"`
 }
+
+type WasherOrderData struct {
+	ID     uint32 `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}

@@ -44,7 +44,7 @@ func main() {
 	userController := controllers.NewUserController(userClient)
 	washstationController := controllers.NewWashStationController(washstationClient)
 
-	orderController := controllers.NewOrderController(orderClient, mapService)
+	orderController := controllers.NewOrderController(orderClient, userClient, mapService)
 
 	router.Echo(e, *userController, *washstationController, *orderController)
 

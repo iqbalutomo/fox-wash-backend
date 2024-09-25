@@ -48,3 +48,26 @@ func OrderEmailBody(data models.Order) (string, error) {
 
 	return buf.String(), nil
 }
+
+func PaymentSuccessEmailBody(data models.PaymentSuccess) (string, error) {
+	template, err := template.ParseFiles("./templates/email_payment_success.html")
+	if err != nil {
+		return "", fmt.Errorf("failed to parsing file: %v", err)
+	}
+
+	templateData := map[string]interface{}{
+		"InvoiceID":   data.InvoiceID,
+		"Status":      data.Status,
+		"Method":      data.Method,
+		"CompletedAt": data.CompletedAt,
+		"Name":        data.Name,
+		"Email":       data.Email,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := template.Execute(buf, templateData); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}

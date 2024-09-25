@@ -165,3 +165,30 @@ func (s *Server) SetWasherStatusOnline(ctx context.Context, data *pb.WasherID) (
 
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Server) PostPublishMessagePaymentSuccess(ctx context.Context, data *pb.PaymentSuccessData) (*pb.PaymentSuccessData, error) {
+	user, err := s.repo.GetUser(data.PayerEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	paymentData := dto.PaymentSuccessData{
+		InvoiceID:   data.InvoiceId,
+		Status:      data.Status,
+		Method:      data.Method,
+		CompletedAt: data.CompletedAt,
+		Name:        user.FirstName,
+		Email:       user.Email,
+	}
+
+	dataJson, err := json.Marshal(paymentData)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err := s.mb.PublishMessagePaymentSuccess(dataJson); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return nil, nil
+}

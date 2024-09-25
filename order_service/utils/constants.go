@@ -3,7 +3,7 @@ package utils
 const (
 	// order status
 	OrderStatusPendingPayment  = "pending payment"
-	OrderStatusWasherPreparing = "washer getting ready"
+	OrderStatusWasherPreparing = "washer is preparing"
 	OrderStatusWasherOnGoing   = "washer on the way"
 	OrderStatusWasherArrived   = "washer has arrived"
 	OrderStatusWasherWashing   = "washer is washing"

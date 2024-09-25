@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Payment Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-box {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            background-color: #E25D0E;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header img {
+            max-width: 150px; /* Adjust logo size as needed */
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+            text-align: left;
+        }
+        .content p {
+            font-size: 16px;
+            color: #333333;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #E25D0E;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 10px; 
+            max-width: 150px; 
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .order-title {
+            font-weight: bold;
+        }
+        .order-value {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="email-box">
+        <div class="header">
+            <h1>Payment Successful</h1>
+        </div>
+        <div class="content">
+            <img src="https://iili.io/dL7ZDl9.png" alt="Logo" class="logo" />
+            <p>Hi <strong>{{ .Name }}</strong>,</p>
+            <p>Your payment successfully! Your motorbike will be clean✨</p>
+
+            <h2>Payment Information</h2>
+            <p><strong>Invoice ID:</strong> {{ .InvoiceID }}</p>
+            <p><strong>Payment Method:</strong> {{ .Method }}</p>
+            <p><strong>Payment Status:</strong> {{ .Status }}</p>
+            <p><strong>Order Status:</strong> <b style="color: #E25D0E;">washer is preparing</b></p>
+
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 FoxWash. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

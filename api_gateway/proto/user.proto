@@ -16,6 +16,8 @@ service User {
     rpc SetWasherStatusOnline(WasherID) returns(google.protobuf.Empty);
     rpc GetAvailableWasher(google.protobuf.Empty) returns(WasherOrderData);
     rpc SetWasherStatusWashing(WasherID) returns(google.protobuf.Empty);
+
+    rpc PostPublishMessagePaymentSuccess(PaymentSuccessData) returns(PaymentSuccessData);
 }
 
 message RegisterRequest {
@@ -65,4 +67,12 @@ message WasherOrderData {
     uint32 id = 1;
     string name = 2;
     string status = 3;
+}
+
+message PaymentSuccessData {
+    string invoice_id = 1;
+    string status = 2;
+    string method = 3;
+    string completed_at = 4;
+    string payer_email = 5;
 }

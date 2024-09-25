@@ -20,9 +20,14 @@ func main() {
 	conn, washstationClient := config.InitWashStationServiceClient()
 	defer conn.Close()
 
+	mbConn, mbChan := config.ConnectMessageBroker()
+	defer mbConn.Close()
+
 	paymentService := services.NewPaymentService(os.Getenv("XENDIT_API_KEY"))
+	messageBrokerService := services.NewMessageBroker(mbChan)
+
 	orderRepo := repository.NewOrderRepository(orderCollection)
-	orderController := controllers.NewOrderController(orderRepo, userServiceClient, washstationClient, paymentService)
+	orderController := controllers.NewOrderController(orderRepo, userServiceClient, washstationClient, paymentService, messageBrokerService)
 
 	config.ListenAndServeGrpc(*orderController)
 }

@@ -6,6 +6,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/joho/godotenv v1.5.1
+	github.com/streadway/amqp v1.1.0
 	github.com/xendit/xendit-go/v3 v3.7.0
 	go.mongodb.org/mongo-driver v1.17.0
 	golang.org/x/sync v0.8.0

@@ -25,18 +25,20 @@ import (
 
 type OrderController struct {
 	orderpb.UnimplementedOrderServiceServer
-	repo               repository.Order
-	userService        userpb.UserClient
-	washstationService washstationpb.WashStationClient
-	paymentService     services.PaymentService
+	repo                 repository.Order
+	userService          userpb.UserClient
+	washstationService   washstationpb.WashStationClient
+	paymentService       services.PaymentService
+	messageBrokerService services.MessageBroker
 }
 
-func NewOrderController(repo repository.Order, uc userpb.UserClient, ws washstationpb.WashStationClient, ps services.PaymentService) *OrderController {
+func NewOrderController(repo repository.Order, uc userpb.UserClient, ws washstationpb.WashStationClient, ps services.PaymentService, mb services.MessageBroker) *OrderController {
 	return &OrderController{
-		repo:               repo,
-		userService:        uc,
-		washstationService: ws,
-		paymentService:     ps,
+		repo:                 repo,
+		userService:          uc,
+		washstationService:   ws,
+		paymentService:       ps,
+		messageBrokerService: mb,
 	}
 }
 
@@ -122,6 +124,47 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	defer cancel()
 
 	if err := o.repo.CreateOrder(ctx, &orderData); err != nil {
+		return nil, err
+	}
+
+	var newMbOrderDetail dto.MbOrderDetail
+	for _, orderItem := range orderData.OrderDetail.WashPackage {
+		newWashPackageData := dto.MbWashPackage{
+			ID:       orderItem.ID,
+			Name:     orderItem.Name,
+			Category: orderItem.Category,
+			Price:    helpers.FormatRupiah(orderItem.Price),
+			Qty:      orderItem.Qty,
+			SubTotal: helpers.FormatRupiah(orderItem.SubTotal),
+		}
+
+		newMbOrderDetail.WashPackage = append(newMbOrderDetail.WashPackage, newWashPackageData)
+	}
+	for _, orderItem := range orderData.OrderDetail.DetailingPackage {
+		newDetailingPackageData := dto.MbDetailingPackage{
+			ID:          orderItem.ID,
+			Name:        orderItem.Name,
+			Description: orderItem.Description,
+			Price:       helpers.FormatRupiah(orderItem.Price),
+			Qty:         orderItem.Qty,
+			SubTotal:    helpers.FormatRupiah(orderItem.SubTotal),
+		}
+
+		newMbOrderDetail.DetailingPackage = append(newMbOrderDetail.DetailingPackage, newDetailingPackageData)
+	}
+	newMbOrderDetail.AppFee = helpers.FormatRupiah(orderData.OrderDetail.AppFee)
+	newMbOrderDetail.TotalPrice = helpers.FormatRupiah(orderData.OrderDetail.TotalPrice)
+
+	mbOrderData := map[string]interface{}{
+		"order_detail": newMbOrderDetail,
+		"User":         orderData.User,
+		"Washer":       orderData.Washer,
+		"Address":      orderData.Address,
+		"Payment":      orderData.Payment,
+		"Status":       orderData.Status,
+	}
+
+	if err := o.messageBrokerService.PublishMessageOrder(mbOrderData); err != nil {
 		return nil, err
 	}
 

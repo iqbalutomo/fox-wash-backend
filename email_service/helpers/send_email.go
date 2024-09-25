@@ -54,3 +54,48 @@ func SendEmailVerification(data models.UserCredential) error {
 
 	return nil
 }
+
+func SendEmailOrder(data models.Order) error {
+	mailtrapUrl := os.Getenv("MAILTRAP_API_URL")
+	authToken := os.Getenv("MAILTRAP_API_TOKEN")
+
+	htmlBody, err := OrderEmailBody(data)
+	if err != nil {
+		return err
+	}
+
+	payload := models.MailtrapEmailPayload{
+		From: models.MailtrapEmailAddress{
+			Email: "hello@iceiceice.biz.id",
+			Name:  "FoxWash",
+		},
+		To: []models.MailtrapEmailAddress{
+			{
+				Email: data.User.Email,
+			},
+		},
+		Subject:  "Your Order Confirmation",
+		Text:     "Thank you for your order!",
+		HTML:     htmlBody,
+		Category: "Order Confirmation",
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	headers := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", authToken),
+		"Content-Type":  "application/json",
+	}
+
+	response, err := FetchAPI(mailtrapUrl, "POST", headers, payloadBytes)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("order confirmation sent to %s\n with response: %v", data.User.Email, response)
+
+	return nil
+}

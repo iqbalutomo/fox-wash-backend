@@ -198,3 +198,181 @@ func (w *WashStationController) DeleteWashPackage(c echo.Context) error {
 		Data:    fmt.Sprintf("Wash package with ID %d", washPackageID),
 	})
 }
+
+func (w *WashStationController) CreateDetailingPackage(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.AdminRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	var detailingPackageData dto.NewDetailingPackageData
+	if err := c.Bind(&detailingPackageData); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	if err := c.Validate(&detailingPackageData); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	newDetailingPackageData := &washstationpb.NewDetailingPackageData{
+		Name:        detailingPackageData.Name,
+		Description: detailingPackageData.Description,
+		Price:       float32(detailingPackageData.Price),
+		CreatedBy:   uint32(user.ID),
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return err
+	}
+	defer cancel()
+
+	data, err := w.client.CreateDetailingPackage(ctx, newDetailingPackageData)
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+
+	response := dto.NewDetailingPackageResponse{
+		ID:          data.Id,
+		Name:        newDetailingPackageData.Name,
+		Description: newDetailingPackageData.Description,
+		Price:       float64(newDetailingPackageData.Price),
+		CreatedBy:   newDetailingPackageData.CreatedBy,
+	}
+
+	return c.JSON(http.StatusCreated, dto.Response{
+		Message: "Detailing package has been created!",
+		Data:    response,
+	})
+}
+
+func (w *WashStationController) GetAllDetailingPackages(c echo.Context) error {
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	detailingPackageData, err := w.client.FindAllDetailingPackages(ctx, &emptypb.Empty{})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Get all detailing packages",
+		Data:    detailingPackageData,
+	})
+}
+
+func (w *WashStationController) GetDetailingPackageByID(c echo.Context) error {
+	detailingPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	detailingPackageData, err := w.client.FindDetailingPackageByID(ctx, &washstationpb.DetailingPackageID{Id: uint32(detailingPackageID)})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: fmt.Sprintf("Get detailing package by %d", detailingPackageID),
+		Data:    detailingPackageData,
+	})
+}
+
+func (w *WashStationController) UpdateDetailingPackage(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.AdminRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	var detailingPackageUpdate dto.UpdateDetailingPackageData
+	detailingPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	if err := c.Bind(&detailingPackageUpdate); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	if err := c.Validate(&detailingPackageUpdate); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	pbUpdateDetailingPackage := &washstationpb.UpdateDetailingPackageData{
+		Id:          uint32(detailingPackageID),
+		Name:        detailingPackageUpdate.Name,
+		Description: detailingPackageUpdate.Description,
+		Price:       float32(detailingPackageUpdate.Price),
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	if _, err := w.client.UpdateDetailingPackage(ctx, pbUpdateDetailingPackage); err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	resp := dto.UpdateDetailingPackageResponse{
+		ID:          pbUpdateDetailingPackage.Id,
+		Name:        pbUpdateDetailingPackage.Name,
+		Description: pbUpdateDetailingPackage.Description,
+		Price:       float64(pbUpdateDetailingPackage.Price),
+		CreatedBy:   uint32(user.ID),
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Detailing package has been updated!",
+		Data:    resp,
+	})
+}
+
+func (w *WashStationController) DeleteDetailingPackage(c echo.Context) error {
+	detailingPackageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.EchoFormatDetails(err.Error()))
+	}
+
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.AdminRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	if _, err := w.client.DeleteDetailingPackage(ctx, &washstationpb.DetailingPackageID{Id: uint32(detailingPackageID)}); err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Detailing package has been deleted!",
+		Data:    fmt.Sprintf("Detailing package with ID %d", detailingPackageID),
+	})
+}

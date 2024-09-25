@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-box {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            background-color: #E25D0E;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header img {
+            max-width: 150px; /* Adjust logo size as needed */
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+            text-align: left;
+        }
+        .content p {
+            font-size: 16px;
+            color: #333333;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #E25D0E;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 10px; 
+            max-width: 150px; 
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .order-title {
+            font-weight: bold;
+        }
+        .order-value {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="email-box">
+        <div class="header">
+            <h1>Order Confirmation</h1>
+        </div>
+        <div class="content">
+            <img src="https://iili.io/dL7ZDl9.png" alt="Logo" class="logo" />
+            <p>Hi <strong>{{ .User.Name }}</strong>,</p>
+            <p>Thank you for your order! Here are the details of your purchase:</p>
+
+            <h2>Order Details</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Package Type</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .order_detail.WashPackage }}
+                    <tr>
+                        <td>Wash Package</td>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Qty }}</td>
+                        <td>{{ .Price }}</td>
+                        <td>{{ .SubTotal }}</td>
+                    </tr>
+                    {{ end }}
+
+                    {{ range .order_detail.DetailingPackage }}
+                    <tr>
+                        <td>Detailing Package</td>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Qty }}</td>
+                        <td>${{ .Price }}</td>
+                        <td>${{ .SubTotal }}</td>
+                    </tr>
+                    {{ end }}
+                    <tr>
+                        <td>App Fee</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{.order_detail.AppFee}}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Total Price</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td style="font-weight: bold;">{{.order_detail.TotalPrice}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Payment Information</h2>
+            <p><strong>Invoice ID:</strong> {{ .Payment.InvoiceID }}</p>
+            <p><strong>Payment Status:</strong> {{ .Payment.Status }}</p>
+            <div style="text-align: center;">
+                <a href="{{ .Payment.InvoiceURL }}" target="_blank" class="btn">Pay Now</a>
+                <hr>
+            </div>
+
+            <div style="text-align: center;">
+                <p>Click the button below to check the location of the motorbike wash address</p>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ .Address.Latitude }},{{ .Address.Longitude }}" target="_blank" class="btn">View on Google Maps</a>
+
+                <hr>
+                <p>If you have any questions, feel free to contact our support team.</p>
+            </div>
+
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 FoxWash. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -72,6 +72,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       PORT: 50053
       APP_FEE: ${APP_FEE}
@@ -81,6 +83,7 @@ services:
       MONGO_DBNAME: ${MONGO_DBNAME}
       MONGO_COLLECTION: ${MONGO_COLLECTION}
       XENDIT_API_KEY: ${XENDIT_API_KEY}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
       SERVICES_JWT_SECRET: ${SERVICES_JWT_SECRET}
 
   rabbitmq:

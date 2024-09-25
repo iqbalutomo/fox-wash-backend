@@ -58,3 +58,12 @@ type Payment struct {
 	Method     string  `json:"method"`
 	Status     string  `json:"status"`
 }
+
+type PaymentSuccess struct {
+	InvoiceID   string `json:"invoice_id"`
+	Status      string `json:"status"`
+	Method      string `json:"method"`
+	CompletedAt string `json:"completed_at"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+}

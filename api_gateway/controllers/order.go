@@ -4,6 +4,7 @@ import (
 	"api_gateway/dto"
 	"api_gateway/helpers"
 	"api_gateway/pb/orderpb"
+	"api_gateway/pb/userpb"
 	"api_gateway/services"
 	"api_gateway/utils"
 	"net/http"
@@ -13,12 +14,13 @@ import (
 )
 
 type OrderController struct {
-	client orderpb.OrderServiceClient
-	maps   services.Maps
+	client     orderpb.OrderServiceClient
+	userClient userpb.UserClient
+	maps       services.Maps
 }
 
-func NewOrderController(client orderpb.OrderServiceClient, maps services.Maps) *OrderController {
-	return &OrderController{client, maps}
+func NewOrderController(client orderpb.OrderServiceClient, userClient userpb.UserClient, maps services.Maps) *OrderController {
+	return &OrderController{client, userClient, maps}
 }
 
 func (o *OrderController) CreateOrder(c echo.Context) error {
@@ -103,6 +105,25 @@ func (o *OrderController) UpdatePaymentStatus(c echo.Context) error {
 
 	if _, err := o.client.UpdateOrderPaymentStatus(ctx, pbPaymentData); err != nil {
 		return utils.AssertGrpcStatus(err)
+	}
+
+	ctx, cancel, err = helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	mbPaymentData := &userpb.PaymentSuccessData{
+		InvoiceId:   pbPaymentData.InvoiceId,
+		Status:      pbPaymentData.Status,
+		Method:      pbPaymentData.Method,
+		CompletedAt: pbPaymentData.CompletedAt,
+		PayerEmail:  paymentData.PayerEmail,
+	}
+
+	_, err = o.userClient.PostPublishMessagePaymentSuccess(ctx, mbPaymentData)
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
 	}
 
 	return c.NoContent(http.StatusOK)

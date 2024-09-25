@@ -12,6 +12,7 @@ import (
 type Mail interface {
 	SendEmailVerification(q amqp.Queue)
 	SendEmailOrder(q amqp.Queue)
+	SendEmailPaymentSuccess(q amqp.Queue)
 }
 
 type MailService struct {
@@ -70,6 +71,35 @@ func (m *MailService) SendEmailOrder(q amqp.Queue) {
 		}
 
 		if err := helpers.SendEmailOrder(orderData); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func (m *MailService) SendEmailPaymentSuccess(q amqp.Queue) {
+	msgs, err := m.channel.Consume(
+		q.Name, //queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		log.Fatalf("failed to consume payment success message: %v", err)
+	}
+
+	for d := range msgs {
+		log.Printf("new order message: %s", d.Body)
+
+		var paymentSuccessData models.PaymentSuccess
+
+		if err := json.Unmarshal(d.Body, &paymentSuccessData); err != nil {
+			log.Fatalf("failed to unmarshaling data: %v", err)
+		}
+
+		if err := helpers.SendPaymentSuccess(paymentSuccessData); err != nil {
 			log.Fatal(err)
 		}
 	}

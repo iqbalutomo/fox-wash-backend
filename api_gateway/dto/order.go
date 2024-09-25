@@ -22,4 +22,5 @@ type InvoiceXenditWebhook struct {
 	Status        string `json:"status"`
 	PaymentMethod string `json:"payment_method"`
 	PaidAt        string `json:"paid_at"`
+	PayerEmail    string `json:"payer_email"`
 }

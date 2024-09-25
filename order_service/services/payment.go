@@ -12,7 +12,7 @@ import (
 )
 
 type PaymentService interface {
-	CreateInvoice(externalID primitive.ObjectID, subtotal float32) (models.Payment, error)
+	CreateInvoice(externalID primitive.ObjectID, subtotal float32, email string) (models.Payment, error)
 }
 
 type XenditClient struct {
@@ -25,8 +25,10 @@ func NewPaymentService(key string) PaymentService {
 	}
 }
 
-func (x *XenditClient) CreateInvoice(externalID primitive.ObjectID, subtotal float32) (models.Payment, error) {
+func (x *XenditClient) CreateInvoice(externalID primitive.ObjectID, subtotal float32, email string) (models.Payment, error) {
 	createInvoiceReq := *invoice.NewCreateInvoiceRequest(externalID.Hex(), subtotal)
+	createInvoiceReq.SetPayerEmail(email)
+
 	resp, _, err := x.client.InvoiceApi.CreateInvoice(context.Background()).CreateInvoiceRequest(createInvoiceReq).Execute()
 	if err != nil {
 		return models.Payment{}, status.Error(codes.Internal, err.Error())

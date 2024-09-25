@@ -100,7 +100,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		Status: availableWasher.Status,
 	}
 
-	paymentData, err := o.paymentService.CreateInvoice(newObjectID, orderItems.TotalPrice)
+	paymentData, err := o.paymentService.CreateInvoice(newObjectID, orderItems.TotalPrice, userData.Email)
 	if err != nil {
 		return nil, err
 	}

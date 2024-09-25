@@ -20,34 +20,36 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WashStation_CreateWashPackage_FullMethodName        = "/wash_station.WashStation/CreateWashPackage"
-	WashStation_FindAllWashPackages_FullMethodName      = "/wash_station.WashStation/FindAllWashPackages"
-	WashStation_FindWashPackageByID_FullMethodName      = "/wash_station.WashStation/FindWashPackageByID"
-	WashStation_FindMultipleWashPackages_FullMethodName = "/wash_station.WashStation/FindMultipleWashPackages"
-	WashStation_UpdateWashPackage_FullMethodName        = "/wash_station.WashStation/UpdateWashPackage"
-	WashStation_DeleteWashPackage_FullMethodName        = "/wash_station.WashStation/DeleteWashPackage"
-	WashStation_CreateDetailingPackage_FullMethodName   = "/wash_station.WashStation/CreateDetailingPackage"
-	WashStation_FindAllDetailingPackages_FullMethodName = "/wash_station.WashStation/FindAllDetailingPackages"
-	WashStation_FindDetailingPackageByID_FullMethodName = "/wash_station.WashStation/FindDetailingPackageByID"
-	WashStation_UpdateDetailingPackage_FullMethodName   = "/wash_station.WashStation/UpdateDetailingPackage"
-	WashStation_DeleteDetailingPackage_FullMethodName   = "/wash_station.WashStation/DeleteDetailingPackage"
+	WashStation_CreateWashPackage_FullMethodName             = "/wash_station.WashStation/CreateWashPackage"
+	WashStation_FindAllWashPackages_FullMethodName           = "/wash_station.WashStation/FindAllWashPackages"
+	WashStation_FindWashPackageByID_FullMethodName           = "/wash_station.WashStation/FindWashPackageByID"
+	WashStation_FindMultipleWashPackages_FullMethodName      = "/wash_station.WashStation/FindMultipleWashPackages"
+	WashStation_UpdateWashPackage_FullMethodName             = "/wash_station.WashStation/UpdateWashPackage"
+	WashStation_DeleteWashPackage_FullMethodName             = "/wash_station.WashStation/DeleteWashPackage"
+	WashStation_CreateDetailingPackage_FullMethodName        = "/wash_station.WashStation/CreateDetailingPackage"
+	WashStation_FindAllDetailingPackages_FullMethodName      = "/wash_station.WashStation/FindAllDetailingPackages"
+	WashStation_FindDetailingPackageByID_FullMethodName      = "/wash_station.WashStation/FindDetailingPackageByID"
+	WashStation_FindMultipleDetailingPackages_FullMethodName = "/wash_station.WashStation/FindMultipleDetailingPackages"
+	WashStation_UpdateDetailingPackage_FullMethodName        = "/wash_station.WashStation/UpdateDetailingPackage"
+	WashStation_DeleteDetailingPackage_FullMethodName        = "/wash_station.WashStation/DeleteDetailingPackage"
 )
 
 // WashStationClient is the client API for WashStation service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WashStationClient interface {
-	// Admin
+	// Wash
 	CreateWashPackage(ctx context.Context, in *NewWashPackageData, opts ...grpc.CallOption) (*CreateWashPackageResponse, error)
 	FindAllWashPackages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WashPackageCompactRepeated, error)
 	FindWashPackageByID(ctx context.Context, in *WashPackageID, opts ...grpc.CallOption) (*WashPackageData, error)
 	FindMultipleWashPackages(ctx context.Context, in *WashPackageIDs, opts ...grpc.CallOption) (*WashPackageCompactRepeated, error)
 	UpdateWashPackage(ctx context.Context, in *UpdateWashPackageData, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteWashPackage(ctx context.Context, in *WashPackageID, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// detailing
+	// Detailing
 	CreateDetailingPackage(ctx context.Context, in *NewDetailingPackageData, opts ...grpc.CallOption) (*CreateDetailingPackageResponse, error)
 	FindAllDetailingPackages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DetailingPackageCompactRepeated, error)
 	FindDetailingPackageByID(ctx context.Context, in *DetailingPackageID, opts ...grpc.CallOption) (*DetailingPackageData, error)
+	FindMultipleDetailingPackages(ctx context.Context, in *DetailingPackageIDs, opts ...grpc.CallOption) (*DetailingPackageCompactRepeated, error)
 	UpdateDetailingPackage(ctx context.Context, in *UpdateDetailingPackageData, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteDetailingPackage(ctx context.Context, in *DetailingPackageID, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -150,6 +152,16 @@ func (c *washStationClient) FindDetailingPackageByID(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *washStationClient) FindMultipleDetailingPackages(ctx context.Context, in *DetailingPackageIDs, opts ...grpc.CallOption) (*DetailingPackageCompactRepeated, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DetailingPackageCompactRepeated)
+	err := c.cc.Invoke(ctx, WashStation_FindMultipleDetailingPackages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *washStationClient) UpdateDetailingPackage(ctx context.Context, in *UpdateDetailingPackageData, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -174,17 +186,18 @@ func (c *washStationClient) DeleteDetailingPackage(ctx context.Context, in *Deta
 // All implementations should embed UnimplementedWashStationServer
 // for forward compatibility.
 type WashStationServer interface {
-	// Admin
+	// Wash
 	CreateWashPackage(context.Context, *NewWashPackageData) (*CreateWashPackageResponse, error)
 	FindAllWashPackages(context.Context, *emptypb.Empty) (*WashPackageCompactRepeated, error)
 	FindWashPackageByID(context.Context, *WashPackageID) (*WashPackageData, error)
 	FindMultipleWashPackages(context.Context, *WashPackageIDs) (*WashPackageCompactRepeated, error)
 	UpdateWashPackage(context.Context, *UpdateWashPackageData) (*emptypb.Empty, error)
 	DeleteWashPackage(context.Context, *WashPackageID) (*emptypb.Empty, error)
-	// detailing
+	// Detailing
 	CreateDetailingPackage(context.Context, *NewDetailingPackageData) (*CreateDetailingPackageResponse, error)
 	FindAllDetailingPackages(context.Context, *emptypb.Empty) (*DetailingPackageCompactRepeated, error)
 	FindDetailingPackageByID(context.Context, *DetailingPackageID) (*DetailingPackageData, error)
+	FindMultipleDetailingPackages(context.Context, *DetailingPackageIDs) (*DetailingPackageCompactRepeated, error)
 	UpdateDetailingPackage(context.Context, *UpdateDetailingPackageData) (*emptypb.Empty, error)
 	DeleteDetailingPackage(context.Context, *DetailingPackageID) (*emptypb.Empty, error)
 }
@@ -222,6 +235,9 @@ func (UnimplementedWashStationServer) FindAllDetailingPackages(context.Context, 
 }
 func (UnimplementedWashStationServer) FindDetailingPackageByID(context.Context, *DetailingPackageID) (*DetailingPackageData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindDetailingPackageByID not implemented")
+}
+func (UnimplementedWashStationServer) FindMultipleDetailingPackages(context.Context, *DetailingPackageIDs) (*DetailingPackageCompactRepeated, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMultipleDetailingPackages not implemented")
 }
 func (UnimplementedWashStationServer) UpdateDetailingPackage(context.Context, *UpdateDetailingPackageData) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDetailingPackage not implemented")
@@ -411,6 +427,24 @@ func _WashStation_FindDetailingPackageByID_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WashStation_FindMultipleDetailingPackages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetailingPackageIDs)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WashStationServer).FindMultipleDetailingPackages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WashStation_FindMultipleDetailingPackages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WashStationServer).FindMultipleDetailingPackages(ctx, req.(*DetailingPackageIDs))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WashStation_UpdateDetailingPackage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateDetailingPackageData)
 	if err := dec(in); err != nil {
@@ -489,6 +523,10 @@ var WashStation_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindDetailingPackageByID",
 			Handler:    _WashStation_FindDetailingPackageByID_Handler,
+		},
+		{
+			MethodName: "FindMultipleDetailingPackages",
+			Handler:    _WashStation_FindMultipleDetailingPackages_Handler,
 		},
 		{
 			MethodName: "UpdateDetailingPackage",

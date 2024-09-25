@@ -46,6 +46,8 @@ func (o *OrderController) CreateOrder(c echo.Context) error {
 	}
 
 	pbWashPackageItems := helpers.AssertToPbWashPackageItems(orderRequest)
+	pbDetailingPackageItems := helpers.AssertToPbDetailingPackageItems(orderRequest)
+
 	pbOrderRequest := &orderpb.CreateOrderRequest{
 		UserId: uint32(user.ID),
 		Name:   user.Name,
@@ -55,7 +57,7 @@ func (o *OrderController) CreateOrder(c echo.Context) error {
 			Longitude: coordinate.Longitude,
 		},
 		WashPackageItems:      pbWashPackageItems,
-		DetailingPackageItems: nil,
+		DetailingPackageItems: pbDetailingPackageItems,
 	}
 
 	ctx, cancel, err := helpers.NewServiceContext()

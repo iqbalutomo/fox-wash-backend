@@ -7,16 +7,18 @@ import "google/protobuf/empty.proto";
 option go_package = "/pb/washstationpb";
 
 service WashStation {
-    // Admin
+    // Wash
     rpc CreateWashPackage(NewWashPackageData) returns(CreateWashPackageResponse);
     rpc FindAllWashPackages(google.protobuf.Empty) returns(WashPackageCompactRepeated);
     rpc FindWashPackageByID(WashPackageID) returns(WashPackageData);
+    rpc FindMultipleWashPackages(WashPackageIDs) returns(WashPackageCompactRepeated);
     rpc UpdateWashPackage(UpdateWashPackageData) returns(google.protobuf.Empty);
     rpc DeleteWashPackage(WashPackageID) returns(google.protobuf.Empty);
-    //detailing
+    // Detailing
     rpc CreateDetailingPackage(NewDetailingPackageData) returns(CreateDetailingPackageResponse);
     rpc FindAllDetailingPackages(google.protobuf.Empty) returns(DetailingPackageCompactRepeated);
     rpc FindDetailingPackageByID(DetailingPackageID) returns(DetailingPackageData);
+    rpc FindMultipleDetailingPackages(DetailingPackageIDs) returns(DetailingPackageCompactRepeated);
     rpc UpdateDetailingPackage(UpdateDetailingPackageData) returns(google.protobuf.Empty);
     rpc DeleteDetailingPackage(DetailingPackageID) returns(google.protobuf.Empty);
 }
@@ -48,6 +50,14 @@ message WashPackageID {
     uint32 id = 1;
 }
 
+message WashPackageIDs {
+    repeated uint32 ids = 1;
+}
+
+message DetailingPackageIDs {
+    repeated uint32 ids = 1;
+}
+
 message WashPackageData {
     uint32 id = 1;
     string name = 2;
@@ -62,8 +72,6 @@ message UpdateWashPackageData {
     float price = 4;
     uint32 created_by = 5;
 }
-
-// detailing package
 
 message NewDetailingPackageData {
     uint32 id = 1;

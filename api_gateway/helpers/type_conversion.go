@@ -18,3 +18,17 @@ func AssertToPbWashPackageItems(orders dto.NewOrderRequest) []*orderpb.WashPacka
 
 	return pbWashPackageItems
 }
+
+func AssertToPbDetailingPackageItems(orders dto.NewOrderRequest) []*orderpb.DetailingPackageItem {
+	var pbDetailingPackageItems []*orderpb.DetailingPackageItem
+	for _, wp := range orders.DetailingPackageItems {
+		pbDetailingPackageItem := &orderpb.DetailingPackageItem{
+			Id:  wp.DetailingPackageID,
+			Qty: wp.Qty,
+		}
+
+		pbDetailingPackageItems = append(pbDetailingPackageItems, pbDetailingPackageItem)
+	}
+
+	return pbDetailingPackageItems
+}

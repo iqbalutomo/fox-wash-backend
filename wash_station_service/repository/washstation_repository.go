@@ -22,6 +22,7 @@ type WashStation interface {
 	CreateDetailingPackage(data *models.Detailing) error
 	FindAllDetailingPackages() ([]models.Detailing, error)
 	FindDetailingPackageByID(DetailingPackageID uint32) (dto.DetailingPackageDataCompact, error)
+	FindMultipleDetailingPackages(DetailingPackageIDs []uint32) ([]*pb.DetailingPackageCompact, error)
 	UpdateDetailingPackage(DetailingPackageID uint32, data *pb.UpdateDetailingPackageData) error
 	DeleteDetailingPackage(DetailingPackageID uint32) error
 }
@@ -97,6 +98,10 @@ func (w *WashStationRepository) UpdateWashPackage(WashPackageID uint32, data *pb
 		return status.Error(codes.Internal, err.Error())
 	}
 
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "invalid wash package ID")
+	}
+
 	return nil
 }
 
@@ -153,24 +158,59 @@ func (w *WashStationRepository) FindDetailingPackageByID(DetailingPackageID uint
 	}, nil
 }
 
+func (w *WashStationRepository) FindMultipleDetailingPackages(DetailingPackageIDs []uint32) ([]*pb.DetailingPackageCompact, error) {
+	var detailingPackages []*pb.DetailingPackageCompact
+
+	res := w.db.Table("detailings").Select("id, name, description, price").Where("id IN ?", DetailingPackageIDs).Order("id").Scan(&detailingPackages)
+	if err := res.Error; err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if res.RowsAffected != int64(len(DetailingPackageIDs)) {
+		return nil, status.Error(codes.InvalidArgument, "Invalid wash package ID")
+	}
+
+	return detailingPackages, nil
+}
+
 func (w *WashStationRepository) UpdateDetailingPackage(DetailingPackageID uint32, data *pb.UpdateDetailingPackageData) error {
-	if err := w.db.Model(&models.Detailing{}).Where("id = ?", DetailingPackageID).Updates(data).Error; err != nil {
+	detailingPackage := models.Detailing{ID: DetailingPackageID}
+
+	res := w.db.Model(&detailingPackage).Updates(models.Detailing{
+		Name:        data.Name,
+		Description: data.Description,
+		Price:       float64(data.Price),
+	})
+	if err := res.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return status.Error(codes.NotFound, err.Error())
 		}
 
 		return status.Error(codes.Internal, err.Error())
 	}
+
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "invalid detailing package ID")
+	}
+
 	return nil
 }
 
 func (w *WashStationRepository) DeleteDetailingPackage(DetailingPackageID uint32) error {
-	if err := w.db.Delete(&models.Detailing{}, DetailingPackageID).Error; err != nil {
+	detailingPackageData := models.Detailing{ID: DetailingPackageID}
+
+	res := w.db.Delete(&detailingPackageData, "id = ?", DetailingPackageID)
+	if err := res.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return status.Error(codes.NotFound, err.Error())
 		}
 
 		return status.Error(codes.Internal, err.Error())
 	}
+
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "invalid detailing package ID")
+	}
+
 	return nil
 }

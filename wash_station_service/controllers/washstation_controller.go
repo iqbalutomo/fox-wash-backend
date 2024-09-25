@@ -170,6 +170,30 @@ func (s *Server) FindDetailingPackageByID(ctx context.Context, detailingPackageI
 	}, nil
 }
 
+func (s *Server) FindMultipleDetailingPackages(ctx context.Context, data *pb.DetailingPackageIDs) (*pb.DetailingPackageCompactRepeated, error) {
+	detailingPackageIDs := data.GetIds()
+	detailingPackages, err := s.repo.FindMultipleDetailingPackages(detailingPackageIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var detailingPackageDatas []*pb.DetailingPackageCompact
+	for _, wash := range detailingPackages {
+		detailingPackageDatas = append(detailingPackageDatas, &pb.DetailingPackageCompact{
+			Id:          wash.Id,
+			Name:        wash.Name,
+			Description: wash.Description,
+			Price:       wash.Price,
+		})
+	}
+
+	response := &pb.DetailingPackageCompactRepeated{
+		DetailingPackages: detailingPackageDatas,
+	}
+
+	return response, nil
+}
+
 func (s *Server) UpdateDetailingPackage(ctx context.Context, data *pb.UpdateDetailingPackageData) (*emptypb.Empty, error) {
 	if err := s.repo.UpdateDetailingPackage(data.Id, data); err != nil {
 		return nil, err

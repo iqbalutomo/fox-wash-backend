@@ -11,7 +11,7 @@ func ConvertOrderToResponsePb(orderData models.Order) *orderpb.CreateOrderRespon
 		ObjectId: orderData.ID.Hex(),
 		OrderDetail: &orderpb.OrderDetail{
 			WashPackages:      convertWashPackages(orderData.OrderDetail.WashPackage),
-			DetailingPackages: nil,
+			DetailingPackages: convertDetailingPackages(orderData.OrderDetail.DetailingPackage),
 			AppFee:            orderData.OrderDetail.AppFee,
 			TotalPrice:        orderData.OrderDetail.TotalPrice,
 		},
@@ -51,6 +51,22 @@ func convertWashPackages(washPackages []models.WashPackage) []*orderpb.WashPacka
 			Price:    wp.Price,
 			Qty:      uint32(wp.Qty),
 			Subtotal: wp.SubTotal,
+		})
+	}
+
+	return result
+}
+
+func convertDetailingPackages(detailingPackages []models.DetailingPackage) []*orderpb.DetailingPackage {
+	var result []*orderpb.DetailingPackage
+	for _, dp := range detailingPackages {
+		result = append(result, &orderpb.DetailingPackage{
+			Id:          uint32(dp.ID),
+			Name:        dp.Name,
+			Description: dp.Description,
+			Price:       dp.Price,
+			Qty:         uint32(dp.Qty),
+			Subtotal:    dp.SubTotal,
 		})
 	}
 

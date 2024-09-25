@@ -1,11 +1,11 @@
-version: "3.8"
-
 services:
   api_gateway:
     build: ./api_gateway
     container_name: api_gateway
     ports:
       - "8080:8080"
+    networks:
+      - my_network
     environment:
       PORT: 8080
       USER_SERVICE_URI: user_service:50051
@@ -18,6 +18,8 @@ services:
     container_name: user_service
     ports:
       - "50051:50051"
+    networks:
+      - my_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,6 +36,8 @@ services:
     container_name: email_service
     ports:
       - "8081:8080"
+    networks:
+      - my_network
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -48,6 +52,8 @@ services:
     container_name: wash_station_service
     ports:
       - "50052:50052"
+    networks:
+      - my_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,6 +61,27 @@ services:
       PORT: 50052
       SERVICES_JWT_SECRET: ${SERVICES_JWT_SECRET}
       POSTGRES_URI: "user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} host=postgres port=5432 dbname=${POSTGRES_DB} sslmode=disable TimeZone=Asia/Jakarta"
+  
+  order_service:
+    build: ./order_service
+    container_name: order_service
+    ports:
+      - "50053:50053"
+    networks:
+      - my_network
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      PORT: 50053
+      APP_FEE: ${APP_FEE}
+      USER_SERVICE_URI: user_service:50051
+      WASHSTATION_SERVICE_URI: wash_station_service:50052
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DBNAME: ${MONGO_DBNAME}
+      MONGO_COLLECTION: ${MONGO_COLLECTION}
+      XENDIT_API_KEY: ${XENDIT_API_KEY}
+      SERVICES_JWT_SECRET: ${SERVICES_JWT_SECRET}
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -62,6 +89,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - my_network
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
@@ -76,6 +105,8 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
+    networks:
+      - my_network
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -87,6 +118,29 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  
+  mongo:
+    image: mongo:4.2
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - my_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres_data:
+  mongo_data:
+
+networks:
+  my_network:

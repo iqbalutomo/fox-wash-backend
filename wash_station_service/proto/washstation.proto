@@ -11,6 +11,7 @@ service WashStation {
     rpc CreateWashPackage(NewWashPackageData) returns(CreateWashPackageResponse);
     rpc FindAllWashPackages(google.protobuf.Empty) returns(WashPackageCompactRepeated);
     rpc FindWashPackageByID(WashPackageID) returns(WashPackageData);
+    rpc FindMultipleWashPackages(WashPackageIDs) returns(WashPackageCompactRepeated);
     rpc UpdateWashPackage(UpdateWashPackageData) returns(google.protobuf.Empty);
     rpc DeleteWashPackage(WashPackageID) returns(google.protobuf.Empty);
     //detailing
@@ -46,6 +47,10 @@ message WashPackageCompact {
 
 message WashPackageID {
     uint32 id = 1;
+}
+
+message WashPackageIDs {
+    repeated uint32 ids = 1;
 }
 
 message WashPackageData {

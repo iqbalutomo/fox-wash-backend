@@ -20,6 +20,8 @@ type User interface {
 	WasherActivation(email string) error
 	GetWasher(userID int32) (dto.WasherData, error)
 	SetWasherStatusOnline(userID uint32) error
+	GetAvailableWasher() (dto.WasherOrderData, error)
+	SetWasherStatusWashing(washerID int32) error
 }
 
 type UserRepository struct {
@@ -151,7 +153,49 @@ func (u *UserRepository) GetWasher(userID int32) (dto.WasherData, error) {
 func (u *UserRepository) SetWasherStatusOnline(userID uint32) error {
 	result := u.db.Table("washers").
 		Where("user_id = ?", userID).
-		Update("is_online", true)
+		Updates(map[string]interface{}{
+			"is_online":        true,
+			"washer_status_id": 1,
+		})
+	if err := result.Error; err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if result.RowsAffected == 0 {
+		return status.Error(codes.InvalidArgument, "Invalid washer ID")
+	}
+
+	return nil
+}
+
+func (u *UserRepository) GetAvailableWasher() (dto.WasherOrderData, error) {
+	var washerData dto.WasherOrderData
+
+	result := u.db.Table("washers w").
+		Select("w.user_id AS id, u.first_name || ' ' || u.last_name AS name, ws.status").
+		Joins("JOIN users u on w.user_id = u.id").
+		Joins("JOIN washer_statuses ws on w.washer_status_id = ws.id").
+		Where("ws.status = ? AND w.is_online = ?", "available", true).
+		Take(&washerData)
+	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dto.WasherOrderData{}, status.Error(codes.Unavailable, "washers not available to take order")
+		}
+
+		return dto.WasherOrderData{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if err := u.SetWasherStatusWashing(int32(washerData.ID)); err != nil {
+		return dto.WasherOrderData{}, err
+	}
+
+	return washerData, nil
+}
+
+func (u *UserRepository) SetWasherStatusWashing(washerID int32) error {
+	result := u.db.Table("washers").
+		Where("user_id = ?", washerID).
+		Update("washer_status_id", utils.WashingWasherStatusID)
 	if err := result.Error; err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}

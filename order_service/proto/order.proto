@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package order;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "/pb/orderpb";
+
+service OrderService {
+    rpc CreateOrder(CreateOrderRequest) returns(CreateOrderResponse);
+    rpc UpdateOrderPaymentStatus(UpdatePaymentRequest) returns(google.protobuf.Empty);
+}
+
+message CreateOrderRequest {
+    uint32 user_id = 1;
+    string name = 2;
+    string email = 3;
+    Address address = 4;
+    repeated WashPackageItem wash_package_items = 5;
+    repeated DetailingPackageItem detailing_package_items = 6;
+}
+
+message Address {
+    float latitude = 1;
+    float longitude = 2;
+}
+
+message WashPackageItem {
+    uint32 id = 1;
+    uint32 qty = 2;
+}
+
+message DetailingPackageItem {
+    uint32 id = 1;
+    uint32 qty = 2;
+}
+
+message CreateOrderResponse {
+    string object_id = 1;
+    OrderDetail order_detail = 2;
+    User user = 3;
+    Washer washer = 4;
+    Address address = 5;
+    Payment payment = 6;
+    string status = 7;
+    string created_at = 8;
+}
+
+message OrderDetail {
+    repeated WashPackage wash_packages = 1;
+    repeated DetailingPackage detailing_packages = 2;
+    float app_fee = 3;
+    float total_price = 4;
+}
+
+message User {
+    uint32 id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message Washer {
+    uint32 id = 1;
+    string name = 2;
+    string status = 3;
+}
+
+message WashPackage {
+    uint32 id = 1;
+    string name = 2;
+    uint32 category = 3;
+    float price = 4;
+    uint32 qty = 5;
+    float subtotal = 6;
+}
+
+message DetailingPackage {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    float price = 4;
+    uint32 qty = 5;
+    float subtotal = 6;
+}
+
+message Payment {
+    string invoice_id = 1;
+    string invoice_url = 2;
+    float total = 3;
+    string method = 4;
+    string status = 5;
+}
+
+message UpdatePaymentRequest {
+    string invoice_id = 1;
+    string status = 2;
+    string method = 3;
+    string completed_at = 4;
+}

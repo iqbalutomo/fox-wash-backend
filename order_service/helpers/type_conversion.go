@@ -25,7 +25,10 @@ func ConvertOrderToResponsePb(orderData models.Order) *orderpb.CreateOrderRespon
 			Name:   orderData.Washer.Name,
 			Status: orderData.Washer.Status,
 		},
-		Address: &orderpb.Address{},
+		Address: &orderpb.Address{
+			Latitude:  orderData.Address.Latitude,
+			Longitude: orderData.Address.Longitude,
+		},
 		Payment: &orderpb.Payment{
 			InvoiceId:  orderData.Payment.InvoiceID,
 			InvoiceUrl: orderData.Payment.InvoiceURL,
@@ -46,6 +49,8 @@ func convertWashPackages(washPackages []models.WashPackage) []*orderpb.WashPacka
 			Name:     wp.Name,
 			Category: uint32(wp.Category),
 			Price:    wp.Price,
+			Qty:      uint32(wp.Qty),
+			Subtotal: wp.SubTotal,
 		})
 	}
 

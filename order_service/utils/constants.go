@@ -2,9 +2,10 @@ package utils
 
 const (
 	// order status
-	OrderStatusPendingPayment = "pending payment"
-	OrderStatusWasherOnGoing  = "washer ongoing"
-	OrderStatusWasherArrived  = "washer is arrived"
-	OrderStatusWasherWashing  = "washer is washing"
-	OrderStatusWasherFinished = "washer is finished"
+	OrderStatusPendingPayment  = "pending payment"
+	OrderStatusWasherPreparing = "washer getting ready"
+	OrderStatusWasherOnGoing   = "washer on the way"
+	OrderStatusWasherArrived   = "washer has arrived"
+	OrderStatusWasherWashing   = "washer is washing"
+	OrderStatusWasherFinished  = "washer has finished"
 )

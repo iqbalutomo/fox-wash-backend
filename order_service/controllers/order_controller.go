@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"math"
 	"order_service/dto"
 	"order_service/helpers"
 	"order_service/models"
@@ -92,6 +93,12 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		return nil, err
 	}
 
+	location, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		return nil, err
+	}
+	localTime := time.Now().In(location)
+
 	orderData := models.Order{
 		ID: newObjectID,
 		OrderDetail: models.OrderDetail{
@@ -108,7 +115,7 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 		},
 		Payment:   paymentData,
 		Status:    utils.OrderStatusPendingPayment,
-		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+		CreatedAt: primitive.NewDateTimeFromTime(localTime),
 	}
 
 	ctx, cancel = context.WithTimeout(context.Background(), 20*time.Second)
@@ -173,15 +180,17 @@ func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.W
 
 	var washPackageDatas []models.WashPackage
 	for _, wp := range <-washPackageDatasChan {
-		qty := washPackageIDWithQty[uint32(wp.ID)]
-		totalPrice += wp.Price * float32(qty)
+		quantity := washPackageIDWithQty[uint32(wp.ID)]
+		subtotal := math.Round(float64(wp.Price) * float64(quantity))
+		totalPrice += float32(subtotal)
 
 		wpData := models.WashPackage{
 			ID:       wp.ID,
 			Name:     wp.Name,
 			Category: wp.Category,
 			Price:    wp.Price,
-			Qty:      wp.Qty,
+			Qty:      uint(quantity),
+			SubTotal: float32(subtotal),
 		}
 
 		washPackageDatas = append(washPackageDatas, wpData)
@@ -196,4 +205,12 @@ func (o *OrderController) CalculateOrder(ctx context.Context, items []*orderpb.W
 	}
 
 	return response, nil
+}
+
+func (o *OrderController) UpdateOrderPaymentStatus(ctx context.Context, data *orderpb.UpdatePaymentRequest) (*emptypb.Empty, error) {
+	if err := o.repo.UpdateOrderPaymentStatus(ctx, data.InvoiceId, data.Status, data.Method, data.CompletedAt); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

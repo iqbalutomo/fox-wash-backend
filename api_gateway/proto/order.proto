@@ -2,10 +2,13 @@ syntax = "proto3";
 
 package order;
 
+import "google/protobuf/empty.proto";
+
 option go_package = "/pb/orderpb";
 
 service OrderService {
     rpc CreateOrder(CreateOrderRequest) returns(CreateOrderResponse);
+    rpc UpdateOrderPaymentStatus(UpdatePaymentRequest) returns(google.protobuf.Empty);
 }
 
 message CreateOrderRequest {
@@ -67,6 +70,8 @@ message WashPackage {
     string name = 2;
     uint32 category = 3;
     float price = 4;
+    uint32 qty = 5;
+    float subtotal = 6;
 }
 
 message DetailingPackage {
@@ -74,6 +79,8 @@ message DetailingPackage {
     string name = 2;
     string description = 3;
     float price = 4;
+    uint32 qty = 5;
+    float subtotal = 6;
 }
 
 message Payment {
@@ -82,4 +89,11 @@ message Payment {
     float total = 3;
     string method = 4;
     string status = 5;
+}
+
+message UpdatePaymentRequest {
+    string invoice_id = 1;
+    string status = 2;
+    string method = 3;
+    string completed_at = 4;
 }

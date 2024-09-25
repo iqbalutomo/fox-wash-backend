@@ -50,4 +50,9 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 			users.POST("/orders", oc.CreateOrder)
 		}
 	}
+
+	payments := e.Group("/payments")
+	{
+		payments.POST("/invoice", oc.UpdatePaymentStatus)
+	}
 }

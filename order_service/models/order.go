@@ -26,6 +26,7 @@ type WashPackage struct {
 	Category int     `bson:"category" json:"category"`
 	Price    float32 `bson:"price" json:"price"`
 	Qty      uint    `bson:"qty" json:"qty"`
+	SubTotal float32 `bson:"subtotal" json:"subtotal"`
 }
 
 type DetailingPackage struct {
@@ -34,6 +35,7 @@ type DetailingPackage struct {
 	Description string  `bson:"description" json:"description"`
 	Price       float32 `bson:"price" json:"price"`
 	Qty         uint    `bson:"qty" json:"qty"`
+	SubTotal    float32 `bson:"subtotal" json:"subtotal"`
 }
 
 type User struct {

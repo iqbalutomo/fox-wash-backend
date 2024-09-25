@@ -15,3 +15,11 @@ type NewOrderDetailingPackageItems struct {
 	DetailingPackageID uint32 `json:"detailing_package_id" validate:"required"`
 	Qty                uint32 `json:"qty" validate:"qty"`
 }
+
+type InvoiceXenditWebhook struct {
+	InvoiceID     string `json:"id"`
+	ExternalID    string `json:"external_id"`
+	Status        string `json:"status"`
+	PaymentMethod string `json:"payment_method"`
+	PaidAt        string `json:"paid_at"`
+}

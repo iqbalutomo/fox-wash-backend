@@ -123,8 +123,8 @@
                         <td>Wash Package</td>
                         <td>{{ .Name }}</td>
                         <td>{{ .Qty }}</td>
-                        <td>Rp. {{ .Price }}</td>
-                        <td>Rp. {{ .SubTotal }}</td>
+                        <td>{{ .Price }}</td>
+                        <td>{{ .SubTotal }}</td>
                     </tr>
                     {{ end }}
 
@@ -133,8 +133,8 @@
                         <td>Detailing Package</td>
                         <td>{{ .Name }}</td>
                         <td>{{ .Qty }}</td>
-                        <td>Rp. ${{ .Price }}</td>
-                        <td>Rp. ${{ .SubTotal }}</td>
+                        <td>${{ .Price }}</td>
+                        <td>${{ .SubTotal }}</td>
                     </tr>
                     {{ end }}
                     <tr>
@@ -142,14 +142,14 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td>Rp. {{.order_detail.AppFee}}</td>
+                        <td>{{.order_detail.AppFee}}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Total Price</td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td style="font-weight: bold;">Rp. {{.order_detail.TotalPrice}}</td>
+                        <td style="font-weight: bold;">{{.order_detail.TotalPrice}}</td>
                     </tr>
                 </tbody>
             </table>

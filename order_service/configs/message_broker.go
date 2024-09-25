@@ -20,19 +20,3 @@ func ConnectMessageBroker() (*amqp.Connection, *amqp.Channel) {
 
 	return conn, ch
 }
-
-func InitMessageBrokerQueue(ch *amqp.Channel, nameType string) amqp.Queue {
-	q, err := ch.QueueDeclare(
-		nameType, // name
-		false,    // durable
-		false,    // delete when unused
-		false,    // exclusive
-		false,    // no-wait
-		nil,      // arguments
-	)
-	if err != nil {
-		log.Fatalf("failed to initialize queue: %v", err)
-	}
-
-	return q
-}

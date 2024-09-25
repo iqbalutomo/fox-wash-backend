@@ -2,13 +2,16 @@ package services
 
 import (
 	"email_service/helpers"
+	"email_service/models"
+	"encoding/json"
 	"log"
 
 	"github.com/streadway/amqp"
 )
 
 type Mail interface {
-	SendEmailVerification(amqp.Queue)
+	SendEmailVerification(q amqp.Queue)
+	SendEmailOrder(q amqp.Queue)
 }
 
 type MailService struct {
@@ -30,14 +33,43 @@ func (m *MailService) SendEmailVerification(q amqp.Queue) {
 		nil,    // args
 	)
 	if err != nil {
-		log.Fatalf("failed to consuming message: %v", err)
+		log.Fatalf("failed to consume verification message: %v", err)
 	}
 
 	for d := range msgs {
-		log.Printf("new message: %s", d.Body)
+		log.Printf("new verification message: %s", d.Body)
 
 		userData := helpers.AssertJsonToStruct(d.Body)
 		if err := helpers.SendEmailVerification(userData); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func (m *MailService) SendEmailOrder(q amqp.Queue) {
+	msgs, err := m.channel.Consume(
+		q.Name, //queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		log.Fatalf("failed to consume order message: %v", err)
+	}
+
+	for d := range msgs {
+		log.Printf("new order message: %s", d.Body)
+
+		var orderData models.Order
+
+		if err := json.Unmarshal(d.Body, &orderData); err != nil {
+			log.Fatalf("failed to unmarshaling data: %v", err)
+		}
+
+		if err := helpers.SendEmailOrder(orderData); err != nil {
 			log.Fatal(err)
 		}
 	}

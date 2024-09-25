@@ -12,10 +12,12 @@ func main() {
 	conn, mbChan := config.ConnectMessageBroker()
 	defer conn.Close()
 
-	q := config.InitMessageBrokerQueue(mbChan)
+	qVerification := config.InitMessageBrokerQueue(mbChan, "email_verification")
+	qOrder := config.InitMessageBrokerQueue(mbChan, "email_order_user")
 	mailService := services.NewMailService(mbChan)
 
-	go mailService.SendEmailVerification(q)
+	go mailService.SendEmailVerification(qVerification)
+	go mailService.SendEmailOrder(qOrder)
 
 	forever := make(chan bool)
 	log.Printf(" [*] waiting for messages. to exit press CTRL+C\n")

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -9,7 +10,7 @@ import (
 )
 
 type MessageBroker interface {
-	PublishMessageVerification(message []byte) error
+	PublishMessageOrder(message map[string]interface{}) error
 }
 
 type RabbitMQ struct {
@@ -20,11 +21,11 @@ func NewMessageBroker(ch *amqp.Channel) MessageBroker {
 	return &RabbitMQ{ch}
 }
 
-func (r *RabbitMQ) PublishMessageVerification(message []byte) error {
-	return r.PublishMessage("email_verification", message)
+func (r *RabbitMQ) PublishMessageOrder(message map[string]interface{}) error {
+	return r.PublishMessage("email_order_user", message)
 }
 
-func (r *RabbitMQ) PublishMessage(queueName string, message []byte) error {
+func (r *RabbitMQ) PublishMessage(queueName string, message map[string]interface{}) error {
 	q, err := r.ch.QueueDeclare(
 		queueName, // name
 		false,     // durable
@@ -37,14 +38,19 @@ func (r *RabbitMQ) PublishMessage(queueName string, message []byte) error {
 		return status.Error(codes.Internal, err.Error())
 	}
 
+	body, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+
 	if err := r.ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory
 		false,  // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        message,
+			ContentType: "application/json",
+			Body:        body,
 		},
 	); err != nil {
 		return status.Error(codes.Internal, err.Error())

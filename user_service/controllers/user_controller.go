@@ -70,7 +70,7 @@ func (s *Server) Register(ctx context.Context, data *pb.RegisterRequest) (*pb.Re
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if err := s.mb.PublishMessage(dataJson); err != nil {
+	if err := s.mb.PublishMessageVerification(dataJson); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

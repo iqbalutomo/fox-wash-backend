@@ -24,6 +24,8 @@ const (
 	OrderService_UpdateOrderPaymentStatus_FullMethodName = "/order.OrderService/UpdateOrderPaymentStatus"
 	OrderService_GetOrderByID_FullMethodName             = "/order.OrderService/GetOrderByID"
 	OrderService_GetWasherAllOrders_FullMethodName       = "/order.OrderService/GetWasherAllOrders"
+	OrderService_GetWasherCurrentOrder_FullMethodName    = "/order.OrderService/GetWasherCurrentOrder"
+	OrderService_UpdateWasherOrderStatus_FullMethodName  = "/order.OrderService/UpdateWasherOrderStatus"
 )
 
 // OrderServiceClient is the client API for OrderService service.
@@ -35,6 +37,8 @@ type OrderServiceClient interface {
 	GetOrderByID(ctx context.Context, in *OrderID, opts ...grpc.CallOption) (*Order, error)
 	// washer
 	GetWasherAllOrders(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*Orders, error)
+	GetWasherCurrentOrder(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*Order, error)
+	UpdateWasherOrderStatus(ctx context.Context, in *UpdateOrderStatusRequest, opts ...grpc.CallOption) (*Order, error)
 }
 
 type orderServiceClient struct {
@@ -85,6 +89,26 @@ func (c *orderServiceClient) GetWasherAllOrders(ctx context.Context, in *WasherI
 	return out, nil
 }
 
+func (c *orderServiceClient) GetWasherCurrentOrder(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*Order, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Order)
+	err := c.cc.Invoke(ctx, OrderService_GetWasherCurrentOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) UpdateWasherOrderStatus(ctx context.Context, in *UpdateOrderStatusRequest, opts ...grpc.CallOption) (*Order, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Order)
+	err := c.cc.Invoke(ctx, OrderService_UpdateWasherOrderStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility.
@@ -94,6 +118,8 @@ type OrderServiceServer interface {
 	GetOrderByID(context.Context, *OrderID) (*Order, error)
 	// washer
 	GetWasherAllOrders(context.Context, *WasherID) (*Orders, error)
+	GetWasherCurrentOrder(context.Context, *WasherID) (*Order, error)
+	UpdateWasherOrderStatus(context.Context, *UpdateOrderStatusRequest) (*Order, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have
@@ -114,6 +140,12 @@ func (UnimplementedOrderServiceServer) GetOrderByID(context.Context, *OrderID) (
 }
 func (UnimplementedOrderServiceServer) GetWasherAllOrders(context.Context, *WasherID) (*Orders, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWasherAllOrders not implemented")
+}
+func (UnimplementedOrderServiceServer) GetWasherCurrentOrder(context.Context, *WasherID) (*Order, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWasherCurrentOrder not implemented")
+}
+func (UnimplementedOrderServiceServer) UpdateWasherOrderStatus(context.Context, *UpdateOrderStatusRequest) (*Order, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWasherOrderStatus not implemented")
 }
 func (UnimplementedOrderServiceServer) testEmbeddedByValue() {}
 
@@ -207,6 +239,42 @@ func _OrderService_GetWasherAllOrders_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetWasherCurrentOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WasherID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetWasherCurrentOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_GetWasherCurrentOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetWasherCurrentOrder(ctx, req.(*WasherID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_UpdateWasherOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOrderStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).UpdateWasherOrderStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_UpdateWasherOrderStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).UpdateWasherOrderStatus(ctx, req.(*UpdateOrderStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +297,14 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWasherAllOrders",
 			Handler:    _OrderService_GetWasherAllOrders_Handler,
+		},
+		{
+			MethodName: "GetWasherCurrentOrder",
+			Handler:    _OrderService_GetWasherCurrentOrder_Handler,
+		},
+		{
+			MethodName: "UpdateWasherOrderStatus",
+			Handler:    _OrderService_UpdateWasherOrderStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

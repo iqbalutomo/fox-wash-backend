@@ -59,6 +59,8 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		{
 			washers.GET("/orders", oc.GetWasherAllOrders)
 			washers.GET("/orders/:id", oc.WasherGetOrderByID)
+			washers.GET("/orders/ongoing", oc.WasherGetCurrentOrder)
+			washers.PUT("/orders/status/:id", oc.UpdateWasherOrderStatus)
 		}
 	}
 

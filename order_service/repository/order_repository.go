@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"order_service/helpers"
 	"order_service/models"
 	"order_service/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,6 +19,8 @@ type Order interface {
 	UpdateOrderPaymentStatus(ctx context.Context, invoiceID, status, method, completeAt string) error
 	FindByID(ctx context.Context, orderID string) (models.Order, error)
 	FindWasherAllOrders(ctx context.Context, washerID uint) ([]models.Order, error)
+	FindWasherCurrentOrder(ctx context.Context, washerID uint) (models.Order, error)
+	UpdateWasherOrderStatus(ctx context.Context, orderID string, washerID uint) (models.Order, error)
 }
 
 type OrderRepository struct {
@@ -100,6 +104,81 @@ func (o *OrderRepository) FindWasherAllOrders(ctx context.Context, washerID uint
 	}
 
 	return orders, nil
+}
+
+func (o *OrderRepository) FindWasherCurrentOrder(ctx context.Context, washerID uint) (models.Order, error) {
+	filter := bson.D{
+		{Key: "$and", Value: bson.A{
+			bson.D{{Key: "washer.id", Value: washerID}},
+			bson.D{{Key: "status", Value: utils.OrderStatusWasherPreparing}},
+			bson.D{{Key: "payment.status", Value: "PAID"}},
+		}},
+	}
+
+	res := o.collection.FindOne(ctx, filter)
+	if err := res.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Order{}, status.Error(codes.NotFound, "No ongoing orders")
+		}
+
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	var order models.Order
+	if err := res.Decode(&order); err != nil {
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return order, nil
+}
+
+func (o *OrderRepository) UpdateWasherOrderStatus(ctx context.Context, orderID string, washerID uint) (models.Order, error) {
+	objectID, err := primitive.ObjectIDFromHex(orderID)
+	if err != nil {
+		return models.Order{}, status.Error(codes.InvalidArgument, "Invalid order ID")
+	}
+
+	filter := bson.D{
+		{Key: "$and", Value: bson.A{
+			bson.D{{Key: "_id", Value: objectID}},
+			bson.D{{Key: "washer.id", Value: washerID}},
+			bson.D{{Key: "payment.status", Value: "PAID"}},
+		}},
+	}
+
+	res := o.collection.FindOne(ctx, filter)
+	if err := res.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Order{}, status.Error(codes.NotFound, "Order not found")
+		}
+
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	var order models.Order
+	if err := res.Decode(&order); err != nil {
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	nextStatus, err := helpers.GetNextStatus(order.Status)
+	if err != nil {
+		return models.Order{}, status.Error(codes.PermissionDenied, err.Error())
+	}
+
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: nextStatus}}}}
+
+	var updatedOrder models.Order
+	if err := o.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().
+		SetReturnDocument(options.After)).
+		Decode(&updatedOrder); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Order{}, status.Error(codes.NotFound, "Order not found")
+		}
+
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return updatedOrder, nil
 }
 
 func (o *OrderRepository) FindWithFilter(ctx context.Context, filter bson.D) ([]models.Order, error) {

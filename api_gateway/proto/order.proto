@@ -12,6 +12,8 @@ service OrderService {
     rpc GetOrderByID(OrderID) returns(Order);
     // washer
     rpc GetWasherAllOrders(WasherID) returns(Orders);
+    rpc GetWasherCurrentOrder(WasherID) returns(Order);
+    rpc UpdateWasherOrderStatus(UpdateOrderStatusRequest) returns(Order);
 }
 
 message CreateOrderRequest {
@@ -122,4 +124,9 @@ message WasherID {
 
 message OrderID {
     string id = 1;
+}
+
+message UpdateOrderStatusRequest {
+    OrderID order_id = 1;
+    WasherID washer_id = 2;
 }

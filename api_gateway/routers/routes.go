@@ -40,6 +40,7 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		washstations.GET("/wash-package/:id", wc.GetWashPackageByID)
 		washstations.PUT("/wash-package/:id", wc.UpdateWashPackage)
 		washstations.DELETE("/wash-package/:id", wc.DeleteWashPackage)
+
 		washstations.POST("/detailing-package", wc.CreateDetailingPackage)
 		washstations.GET("/detailing-package/all", wc.GetAllDetailingPackages)
 		washstations.GET("/detailing-package/:id", wc.GetDetailingPackageByID)
@@ -53,6 +54,10 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		users := orders.Group("/users")
 		{
 			users.POST("/orders", oc.CreateOrder)
+		}
+		washers := orders.Group("/washers")
+		{
+			washers.GET("/orders", oc.GetWasherAllOrders)
 		}
 	}
 

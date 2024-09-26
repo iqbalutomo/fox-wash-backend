@@ -128,3 +128,30 @@ func (o *OrderController) UpdatePaymentStatus(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
+
+func (o *OrderController) GetWasherAllOrders(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.WasherRole {
+		return echo.NewHTTPError(utils.ErrUnauthorized.EchoFormatDetails("Access permission"))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	orders, err := o.client.GetWasherAllOrders(ctx, &orderpb.WasherID{Id: uint32(user.ID)})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Get all washers orders",
+		Data:    orders,
+	})
+}

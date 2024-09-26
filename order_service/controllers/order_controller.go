@@ -315,3 +315,14 @@ func (o *OrderController) UpdateOrderPaymentStatus(ctx context.Context, data *or
 
 	return &emptypb.Empty{}, nil
 }
+
+func (o *OrderController) GetWasherAllOrders(ctx context.Context, data *orderpb.WasherID) (*orderpb.Orders, error) {
+	ordersTmp, err := o.repo.FindWasherAllOrders(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	orders := helpers.AssertOrdersToPb(ordersTmp)
+
+	return &orderpb.Orders{Orders: orders}, nil
+}

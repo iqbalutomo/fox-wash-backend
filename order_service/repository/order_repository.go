@@ -15,6 +15,7 @@ import (
 type Order interface {
 	CreateOrder(ctx context.Context, data *models.Order) error
 	UpdateOrderPaymentStatus(ctx context.Context, invoiceID, status, method, completeAt string) error
+	FindByID(ctx context.Context, orderID string) (models.Order, error)
 	FindWasherAllOrders(ctx context.Context, washerID uint) ([]models.Order, error)
 }
 
@@ -62,6 +63,29 @@ func (o *OrderRepository) UpdateWithFilter(ctx context.Context, field bson.D, da
 	}
 
 	return nil
+}
+
+func (o *OrderRepository) FindByID(ctx context.Context, orderID string) (models.Order, error) {
+	objectID, err := primitive.ObjectIDFromHex(orderID)
+	if err != nil {
+		return models.Order{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res := o.collection.FindOne(ctx, bson.M{"_id": objectID})
+	if err := res.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Order{}, status.Error(codes.NotFound, err.Error())
+		}
+
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	var order models.Order
+	if err := res.Decode(&order); err != nil {
+		return models.Order{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return order, nil
 }
 
 func (o *OrderRepository) FindWasherAllOrders(ctx context.Context, washerID uint) ([]models.Order, error) {

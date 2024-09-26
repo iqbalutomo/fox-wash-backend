@@ -155,3 +155,32 @@ func (o *OrderController) GetWasherAllOrders(c echo.Context) error {
 		Data:    orders,
 	})
 }
+
+func (o *OrderController) WasherGetOrderByID(c echo.Context) error {
+	orderID := c.Param("id")
+
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.WasherRole {
+		return echo.NewHTTPError(utils.ErrUnauthorized.EchoFormatDetails("Access permission"))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	order, err := o.client.GetOrderByID(ctx, &orderpb.OrderID{Id: orderID})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Get order by ID success",
+		Data:    order,
+	})
+}

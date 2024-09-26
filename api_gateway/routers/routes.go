@@ -58,6 +58,7 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		washers := orders.Group("/washers")
 		{
 			washers.GET("/orders", oc.GetWasherAllOrders)
+			washers.GET("/orders/:id", oc.WasherGetOrderByID)
 		}
 	}
 

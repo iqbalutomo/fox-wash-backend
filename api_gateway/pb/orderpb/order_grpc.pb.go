@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	OrderService_CreateOrder_FullMethodName              = "/order.OrderService/CreateOrder"
 	OrderService_UpdateOrderPaymentStatus_FullMethodName = "/order.OrderService/UpdateOrderPaymentStatus"
+	OrderService_GetOrderByID_FullMethodName             = "/order.OrderService/GetOrderByID"
 	OrderService_GetWasherAllOrders_FullMethodName       = "/order.OrderService/GetWasherAllOrders"
 )
 
@@ -31,6 +32,7 @@ const (
 type OrderServiceClient interface {
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
 	UpdateOrderPaymentStatus(ctx context.Context, in *UpdatePaymentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetOrderByID(ctx context.Context, in *OrderID, opts ...grpc.CallOption) (*Order, error)
 	// washer
 	GetWasherAllOrders(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*Orders, error)
 }
@@ -63,6 +65,16 @@ func (c *orderServiceClient) UpdateOrderPaymentStatus(ctx context.Context, in *U
 	return out, nil
 }
 
+func (c *orderServiceClient) GetOrderByID(ctx context.Context, in *OrderID, opts ...grpc.CallOption) (*Order, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Order)
+	err := c.cc.Invoke(ctx, OrderService_GetOrderByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *orderServiceClient) GetWasherAllOrders(ctx context.Context, in *WasherID, opts ...grpc.CallOption) (*Orders, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Orders)
@@ -79,6 +91,7 @@ func (c *orderServiceClient) GetWasherAllOrders(ctx context.Context, in *WasherI
 type OrderServiceServer interface {
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
 	UpdateOrderPaymentStatus(context.Context, *UpdatePaymentRequest) (*emptypb.Empty, error)
+	GetOrderByID(context.Context, *OrderID) (*Order, error)
 	// washer
 	GetWasherAllOrders(context.Context, *WasherID) (*Orders, error)
 }
@@ -95,6 +108,9 @@ func (UnimplementedOrderServiceServer) CreateOrder(context.Context, *CreateOrder
 }
 func (UnimplementedOrderServiceServer) UpdateOrderPaymentStatus(context.Context, *UpdatePaymentRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrderPaymentStatus not implemented")
+}
+func (UnimplementedOrderServiceServer) GetOrderByID(context.Context, *OrderID) (*Order, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrderByID not implemented")
 }
 func (UnimplementedOrderServiceServer) GetWasherAllOrders(context.Context, *WasherID) (*Orders, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWasherAllOrders not implemented")
@@ -155,6 +171,24 @@ func _OrderService_UpdateOrderPaymentStatus_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetOrderByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OrderID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetOrderByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_GetOrderByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetOrderByID(ctx, req.(*OrderID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OrderService_GetWasherAllOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WasherID)
 	if err := dec(in); err != nil {
@@ -187,6 +221,10 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateOrderPaymentStatus",
 			Handler:    _OrderService_UpdateOrderPaymentStatus_Handler,
+		},
+		{
+			MethodName: "GetOrderByID",
+			Handler:    _OrderService_GetOrderByID_Handler,
 		},
 		{
 			MethodName: "GetWasherAllOrders",

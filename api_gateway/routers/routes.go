@@ -24,6 +24,7 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		})
 
 		users.POST("/login", uc.Login)
+		users.POST("/logout", uc.Logout, middlewares.Auth)
 	}
 
 	admin := e.Group("/admins")

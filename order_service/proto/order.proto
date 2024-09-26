@@ -12,6 +12,7 @@ service OrderService {
     rpc GetOrderByID(OrderID) returns(Order);
     // washer
     rpc GetWasherAllOrders(WasherID) returns(Orders);
+    rpc GetWasherCurrentOrder(WasherID) returns(Order);
 }
 
 message CreateOrderRequest {

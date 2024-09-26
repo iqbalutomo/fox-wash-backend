@@ -337,3 +337,14 @@ func (o *OrderController) GetWasherAllOrders(ctx context.Context, data *orderpb.
 
 	return &orderpb.Orders{Orders: orders}, nil
 }
+
+func (o *OrderController) GetWasherCurrentOrder(ctx context.Context, data *orderpb.WasherID) (*orderpb.Order, error) {
+	orderTmp, err := o.repo.FindWasherCurrentOrder(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	order := helpers.AssertOrderToPb(orderTmp)
+
+	return order, nil
+}

@@ -184,3 +184,30 @@ func (o *OrderController) WasherGetOrderByID(c echo.Context) error {
 		Data:    order,
 	})
 }
+
+func (o *OrderController) WasherGetCurrentOrder(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if user.Role != utils.WasherRole {
+		return echo.NewHTTPError(utils.ErrForbidden.EchoFormatDetails("Access permission"))
+	}
+
+	ctx, cancel, err := helpers.NewServiceContext()
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+	}
+	defer cancel()
+
+	order, err := o.client.GetWasherCurrentOrder(ctx, &orderpb.WasherID{Id: uint32(user.ID)})
+	if err != nil {
+		return utils.AssertGrpcStatus(err)
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Get washers current order success",
+		Data:    order,
+	})
+}

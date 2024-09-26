@@ -9,6 +9,9 @@ option go_package = "/pb/orderpb";
 service OrderService {
     rpc CreateOrder(CreateOrderRequest) returns(CreateOrderResponse);
     rpc UpdateOrderPaymentStatus(UpdatePaymentRequest) returns(google.protobuf.Empty);
+    rpc GetOrderByID(OrderID) returns(Order);
+    // washer
+    rpc GetWasherAllOrders(WasherID) returns(Orders);
 }
 
 message CreateOrderRequest {
@@ -33,6 +36,21 @@ message WashPackageItem {
 message DetailingPackageItem {
     uint32 id = 1;
     uint32 qty = 2;
+}
+
+message Orders {
+    repeated Order orders = 1;
+}
+
+message Order {
+    string object_id = 1;
+    OrderDetail order_detail = 2;
+    User user = 3;
+    Washer washer = 4;
+    Address address = 5;
+    Payment payment = 6;
+    string status = 7;
+    string created_at = 8;
 }
 
 message CreateOrderResponse {
@@ -96,4 +114,12 @@ message UpdatePaymentRequest {
     string status = 2;
     string method = 3;
     string completed_at = 4;
+}
+
+message WasherID {
+    uint32 id = 1;
+}
+
+message OrderID {
+    string id = 1;
 }

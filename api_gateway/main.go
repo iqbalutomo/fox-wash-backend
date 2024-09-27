@@ -20,6 +20,18 @@ type Template struct {
 	templates *template.Template
 }
 
+// @title Fox Wash
+// @version 0.0.1
+// @description Online motorcycle washing service built with microservices that integrates user, washer, and admin.
+
+// @contact.name The developer
+// @contact.email muhlisiqbalutomoo@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host 3ee9-103-18-34-211.ngrok-free.app
+// @BasePath /
 func main() {
 	e := echo.New()
 	e.Validator = &utils.CustomValidator{NewValidator: validator.New()}

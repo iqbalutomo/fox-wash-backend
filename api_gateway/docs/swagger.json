@@ -1,0 +1,1341 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Online motorcycle washing service built with microservices that integrates user, washer, and admin.",
+        "title": "Fox Wash",
+        "contact": {
+            "name": "The developer",
+            "email": "muhlisiqbalutomoo@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "0.0.1"
+    },
+    "host": "3ee9-103-18-34-211.ngrok-free.app",
+    "basePath": "/",
+    "paths": {
+        "/admins/washer-activation/{email}": {
+            "post": {
+                "description": "Activation washer by admin for hired washer as team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Washer Activation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email Washer",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "Login users and embeds a JWt-Auth in cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Log in",
+                "parameters": [
+                    {
+                        "description": "User login details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/orders": {
+            "post": {
+                "description": "Create a new order for the logged in user. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Create new order",
+                "parameters": [
+                    {
+                        "description": "Order details",
+                        "name": "orderRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.NewOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseOrder"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register/admin": {
+            "post": {
+                "description": "Register a new user with the role 'admin'",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Register a new admin",
+                "parameters": [
+                    {
+                        "description": "Admin registration details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseRegister"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register/user": {
+            "post": {
+                "description": "Register a new user with the role 'user'",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User registration details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseRegister"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register/washer": {
+            "post": {
+                "description": "Register a new user with the role 'washer'",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "washer"
+                ],
+                "summary": "Register a new washer",
+                "parameters": [
+                    {
+                        "description": "Washer registration details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseRegister"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/verify/{userid}/{token}": {
+            "get": {
+                "description": "Verify the user registration using unique token sent to the registered email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Verify user credentials",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Verification token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washers/orders": {
+            "get": {
+                "description": "Retrieve all orders related to the logged in washer. You will need an 'Authorization' cookie attached with this request.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "washer"
+                ],
+                "summary": "Get all washer's orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseWasherGetAllOrders"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washers/orders/ongoing": {
+            "get": {
+                "description": "Retrieve ongoing order related to the logged in washer. You will need an 'Authorization' cookie attached with this request.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "washer"
+                ],
+                "summary": "Get current washer's order",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseWasherGetCurrentOrder"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washers/orders/status/{id}": {
+            "put": {
+                "description": "Updates ongoing order status related to the logged in washer. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "washer"
+                ],
+                "summary": "Update washer's order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseUpdateOrderStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washers/orders/{id}": {
+            "get": {
+                "description": "Retrieve an order by it's ID. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "washer"
+                ],
+                "summary": "Get order by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseOrder"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washstations/wash-package": {
+            "post": {
+                "description": "Creates new package data specific to the current logged in admin. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Create wash package for admin",
+                "parameters": [
+                    {
+                        "description": "Create Wash Package",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerNewWashPackageData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseNewWashPackageByAdmin"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washstations/wash-package/all": {
+            "get": {
+                "description": "Retrieve all wash package datas from the database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Get all wash package datas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseGetAllWashPackage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/washstations/wash-package/{id}": {
+            "get": {
+                "description": "Retrieve specific wash package data using the wash package id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Get wash package by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseGetWashPackageByID"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates existing package data specific to the current logged in admin. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update wash package by admin",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Wash Package",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerUpdateWashPackageData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseGetWashPackageByID"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes existing package for the current logged in admin. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete wash package by admin",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.NewOrderDetailingPackageItems": {
+            "type": "object",
+            "required": [
+                "detailing_package_id"
+            ],
+            "properties": {
+                "detailing_package_id": {
+                    "type": "integer"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.NewOrderRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "detailing_package_items",
+                "wash_package_items"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "detailing_package_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.NewOrderDetailingPackageItems"
+                    }
+                },
+                "wash_package_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.NewOrderWashPackageItems"
+                    }
+                }
+            }
+        },
+        "dto.NewOrderWashPackageItems": {
+            "type": "object",
+            "required": [
+                "wash_package_id"
+            ],
+            "properties": {
+                "qty": {
+                    "type": "integer"
+                },
+                "wash_package_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.NewWashPackageResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "x-order": "0"
+                },
+                "name": {
+                    "type": "string",
+                    "x-order": "1"
+                },
+                "category": {
+                    "type": "integer",
+                    "x-order": "2"
+                },
+                "price": {
+                    "type": "number",
+                    "x-order": "3"
+                },
+                "created_by": {
+                    "type": "integer",
+                    "x-order": "4"
+                }
+            }
+        },
+        "dto.Response": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerNewWashPackageData": {
+            "type": "object",
+            "required": [
+                "category",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "category": {
+                    "type": "integer",
+                    "x-order": "1"
+                },
+                "price": {
+                    "type": "number",
+                    "x-order": "2"
+                }
+            }
+        },
+        "dto.SwaggerResponseGetAllWashPackage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/washstationpb.WashPackageCompactRepeated"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseGetWashPackageByID": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/washstationpb.WashPackageCompact"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseNewWashPackageByAdmin": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.NewWashPackageResponse"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseOrder": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Order"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseRegister": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseUpdateOrderStatus": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Order"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseWasherGetAllOrders": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Orders"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseWasherGetCurrentOrder": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Order"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerUpdateWashPackageData": {
+            "type": "object",
+            "required": [
+                "category",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "category": {
+                    "type": "integer",
+                    "x-order": "1"
+                },
+                "price": {
+                    "type": "number",
+                    "x-order": "2"
+                }
+            }
+        },
+        "dto.UserLogin": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "password": {
+                    "type": "string",
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.UserRegister": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "password"
+            ],
+            "properties": {
+                "first_name": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "last_name": {
+                    "type": "string",
+                    "x-order": "1"
+                },
+                "email": {
+                    "type": "string",
+                    "x-order": "2"
+                },
+                "password": {
+                    "type": "string",
+                    "x-order": "3"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "orderpb.Address": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
+        "orderpb.DetailingPackage": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "qty": {
+                    "type": "integer"
+                },
+                "subtotal": {
+                    "type": "number"
+                }
+            }
+        },
+        "orderpb.Order": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/orderpb.Address"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "object_id": {
+                    "type": "string"
+                },
+                "order_detail": {
+                    "$ref": "#/definitions/orderpb.OrderDetail"
+                },
+                "payment": {
+                    "$ref": "#/definitions/orderpb.Payment"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/orderpb.User"
+                },
+                "washer": {
+                    "$ref": "#/definitions/orderpb.Washer"
+                }
+            }
+        },
+        "orderpb.OrderDetail": {
+            "type": "object",
+            "properties": {
+                "app_fee": {
+                    "type": "number"
+                },
+                "detailing_packages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/orderpb.DetailingPackage"
+                    }
+                },
+                "total_price": {
+                    "type": "number"
+                },
+                "wash_packages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/orderpb.WashPackage"
+                    }
+                }
+            }
+        },
+        "orderpb.Orders": {
+            "type": "object",
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/orderpb.Order"
+                    }
+                }
+            }
+        },
+        "orderpb.Payment": {
+            "type": "object",
+            "properties": {
+                "invoice_id": {
+                    "type": "string"
+                },
+                "invoice_url": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "orderpb.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "orderpb.WashPackage": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "qty": {
+                    "type": "integer"
+                },
+                "subtotal": {
+                    "type": "number"
+                }
+            }
+        },
+        "orderpb.Washer": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.ErrResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "integer",
+                    "x-order": "0"
+                },
+                "type": {
+                    "type": "string",
+                    "x-order": "1"
+                },
+                "detail": {
+                    "type": "string",
+                    "x-order": "2"
+                }
+            }
+        },
+        "washstationpb.WashPackageCompact": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "washstationpb.WashPackageCompactRepeated": {
+            "type": "object",
+            "properties": {
+                "wash_packages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/washstationpb.WashPackageCompact"
+                    }
+                }
+            }
+        }
+    }
+}

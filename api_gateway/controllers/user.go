@@ -6,8 +6,10 @@ import (
 	"api_gateway/models"
 	"api_gateway/pb/userpb"
 	"api_gateway/utils"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -236,5 +238,41 @@ func (u *UserController) WasherActivation(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Washer has been activated!",
 		Data:    email,
+	})
+}
+
+func (u *UserController) Logout(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	fmt.Println(user)
+	if err != nil {
+		return err
+	}
+
+	if user.Role == utils.WasherRole {
+		ctx, cancel, err := helpers.NewServiceContext()
+		if err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+		}
+		defer cancel()
+
+		washerData, err := u.client.GetWasher(ctx, &userpb.WasherID{Id: uint32(user.ID)})
+		if err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+		}
+		if _, err := u.client.SetWasherStatusOffline(ctx, &userpb.WasherID{Id: washerData.UserId}); err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.EchoFormatDetails(err.Error()))
+		}
+	}
+
+	c.SetCookie(&http.Cookie{
+		Name:     "Authorization",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Expires:  time.Unix(0, 0)})
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Logout successfully",
+		Data:    "Authorization in cookie is deleted",
 	})
 }

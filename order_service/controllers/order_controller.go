@@ -183,6 +183,17 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	return response, nil
 }
 
+func (o *OrderController) GetUserAllOrders(ctx context.Context, data *orderpb.WasherID) (*orderpb.Orders, error) {
+	ordersTmp, err := o.repo.FindUserAllOrders(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	orders := helpers.AssertOrdersToPb(ordersTmp)
+
+	return &orderpb.Orders{Orders: orders}, nil
+}
+
 func (o *OrderController) CalculateOrder(ctx context.Context, washPackageItems []*orderpb.WashPackageItem, detailingPackageItems []*orderpb.DetailingPackageItem) (dto.OrderCalculateResponse, error) {
 	fee, err := strconv.ParseFloat(os.Getenv("APP_FEE"), 32)
 	if err != nil {

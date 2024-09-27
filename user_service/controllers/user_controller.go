@@ -166,6 +166,16 @@ func (s *Server) SetWasherStatusOnline(ctx context.Context, data *pb.WasherID) (
 	return &emptypb.Empty{}, nil
 }
 
+func (s *Server) SetWasherStatusOffline(ctx context.Context, data *pb.WasherID) (*emptypb.Empty, error) {
+	washerID := data.Id
+
+	if err := s.repo.SetWasherStatusOffline(washerID); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (s *Server) PostPublishMessagePaymentSuccess(ctx context.Context, data *pb.PaymentSuccessData) (*pb.PaymentSuccessData, error) {
 	user, err := s.repo.GetUser(data.PayerEmail)
 	if err != nil {

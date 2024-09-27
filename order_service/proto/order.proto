@@ -8,6 +8,7 @@ option go_package = "/pb/orderpb";
 
 service OrderService {
     rpc CreateOrder(CreateOrderRequest) returns(CreateOrderResponse);
+    rpc GetUserAllOrders(WasherID) returns(Orders);
     rpc UpdateOrderPaymentStatus(UpdatePaymentRequest) returns(google.protobuf.Empty);
     rpc GetOrderByID(OrderID) returns(Order);
     // washer

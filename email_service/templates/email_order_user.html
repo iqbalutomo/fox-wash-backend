@@ -158,13 +158,13 @@
             <p><strong>Invoice ID:</strong> {{ .Payment.InvoiceID }}</p>
             <p><strong>Payment Status:</strong> {{ .Payment.Status }}</p>
             <div style="text-align: center;">
-                <a href="{{ .Payment.InvoiceURL }}" target="_blank" class="btn">Pay Now</a>
+                <a href="{{ .Payment.InvoiceURL }}" target="_blank" class="btn" style="color: white;">Pay Now</a>
                 <hr>
             </div>
 
             <div style="text-align: center;">
                 <p>Click the button below to check the location of the motorbike wash address</p>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ .Address.Latitude }},{{ .Address.Longitude }}" target="_blank" class="btn">View on Google Maps</a>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ .Address.Latitude }},{{ .Address.Longitude }}" target="_blank" class="btn" style="color: white;">View on Google Maps</a>
 
                 <hr>
                 <p>If you have any questions, feel free to contact our support team.</p>

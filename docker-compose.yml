@@ -45,7 +45,7 @@ services:
       MAILTRAP_API_TOKEN: ${MAILTRAP_API_TOKEN}
       MAILTRAP_API_URL: ${MAILTRAP_API_URL}
       RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
-      VERIFICATION_URL: localhost:8080/users/verify
+      VERIFICATION_URL: https://3ee9-103-18-34-211.ngrok-free.app/users/verify
   
   wash_station_service:
     build: ./wash_station_service

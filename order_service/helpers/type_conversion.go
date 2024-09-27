@@ -72,3 +72,86 @@ func convertDetailingPackages(detailingPackages []models.DetailingPackage) []*or
 
 	return result
 }
+
+func AssertOrdersToPb(ordersTmp []models.Order) []*orderpb.Order {
+	orders := []*orderpb.Order{}
+	for _, orderTmp := range ordersTmp {
+		order := AssertOrderToPb(orderTmp)
+		orders = append(orders, order)
+	}
+
+	return orders
+}
+
+func AssertOrderToPb(orderTmp models.Order) *orderpb.Order {
+	var washPackages []*orderpb.WashPackage
+	for _, washPackageTmp := range orderTmp.OrderDetail.WashPackage {
+		washPackage := &orderpb.WashPackage{
+			Id:       uint32(washPackageTmp.ID),
+			Name:     washPackageTmp.Name,
+			Category: uint32(washPackageTmp.Category),
+			Price:    washPackageTmp.Price,
+			Qty:      uint32(washPackageTmp.Qty),
+			Subtotal: washPackageTmp.SubTotal,
+		}
+
+		washPackages = append(washPackages, washPackage)
+	}
+
+	var detailingPackages []*orderpb.DetailingPackage
+	for _, detailingPackageTmp := range orderTmp.OrderDetail.DetailingPackage {
+		detailingPackage := &orderpb.DetailingPackage{
+			Id:          uint32(detailingPackageTmp.ID),
+			Name:        detailingPackageTmp.Name,
+			Description: detailingPackageTmp.Description,
+			Price:       detailingPackageTmp.Price,
+			Qty:         uint32(detailingPackageTmp.Qty),
+			Subtotal:    detailingPackageTmp.SubTotal,
+		}
+
+		detailingPackages = append(detailingPackages, detailingPackage)
+	}
+
+	orderDetailData := &orderpb.OrderDetail{
+		WashPackages:      washPackages,
+		DetailingPackages: detailingPackages,
+		AppFee:            orderTmp.OrderDetail.AppFee,
+		TotalPrice:        orderTmp.OrderDetail.TotalPrice,
+	}
+
+	userData := &orderpb.User{
+		Id:    uint32(orderTmp.User.ID),
+		Name:  orderTmp.User.Name,
+		Email: orderTmp.User.Email,
+	}
+
+	washerData := &orderpb.Washer{
+		Id:     uint32(orderTmp.Washer.ID),
+		Name:   orderTmp.Washer.Name,
+		Status: orderTmp.Washer.Status,
+	}
+
+	paymentData := &orderpb.Payment{
+		InvoiceId:  orderTmp.Payment.InvoiceID,
+		InvoiceUrl: orderTmp.Payment.InvoiceURL,
+		Total:      orderTmp.Payment.Total,
+		Method:     orderTmp.Payment.Method,
+		Status:     orderTmp.Payment.Status,
+	}
+
+	order := &orderpb.Order{
+		ObjectId:    orderTmp.ID.Hex(),
+		OrderDetail: orderDetailData,
+		User:        userData,
+		Washer:      washerData,
+		Address: &orderpb.Address{
+			Latitude:  orderTmp.Address.Latitude,
+			Longitude: orderTmp.Address.Longitude,
+		},
+		Payment:   paymentData,
+		Status:    orderTmp.Status,
+		CreatedAt: orderTmp.CreatedAt.Time().String(),
+	}
+
+	return order
+}

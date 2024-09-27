@@ -20,6 +20,7 @@ type User interface {
 	WasherActivation(email string) error
 	GetWasher(userID int32) (dto.WasherData, error)
 	SetWasherStatusOnline(userID uint32) error
+	SetWasherStatusOffline(userID uint32) error
 	GetAvailableWasher() (dto.WasherOrderData, error)
 	SetWasherStatusWashing(washerID int32) error
 }
@@ -156,6 +157,24 @@ func (u *UserRepository) SetWasherStatusOnline(userID uint32) error {
 		Updates(map[string]interface{}{
 			"is_online":        true,
 			"washer_status_id": 1,
+		})
+	if err := result.Error; err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if result.RowsAffected == 0 {
+		return status.Error(codes.InvalidArgument, "Invalid washer ID")
+	}
+
+	return nil
+}
+
+func (u *UserRepository) SetWasherStatusOffline(userID uint32) error {
+	result := u.db.Table("washers").
+		Where("user_id = ?", userID).
+		Updates(map[string]interface{}{
+			"is_online":        false,
+			"washer_status_id": 3,
 		})
 	if err := result.Error; err != nil {
 		return status.Error(codes.Internal, err.Error())

@@ -21,6 +21,18 @@ func NewWashStationController(client washstationpb.WashStationClient) *WashStati
 	return &WashStationController{client}
 }
 
+// Admin   godoc
+// @Summary      Create wash package for admin
+// @Description  Creates new package data specific to the current logged in admin. You will need an 'Authorization' cookie attached with this request.
+// @Tags         admin
+// @Accept       json
+// @Produce      json
+// @param        request body dto.SwaggerNewWashPackageData true "Create Wash Package"
+// @Success      201  {object}  dto.SwaggerResponseNewWashPackageByAdmin
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /washstations/wash-package [post]
 func (w *WashStationController) CreateWashPackage(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {
@@ -72,6 +84,15 @@ func (w *WashStationController) CreateWashPackage(c echo.Context) error {
 	})
 }
 
+// Admin      godoc
+// @Summary      Get all wash package datas
+// @Description  Retrieve all wash package datas from the database.
+// @Tags         all user
+// @Produce      json
+// @Success      200  {object}  dto.SwaggerResponseGetAllWashPackage
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /washstations/wash-package/all [get]
 func (w *WashStationController) GetAllWashPackages(c echo.Context) error {
 	ctx, cancel, err := helpers.NewServiceContext()
 	if err != nil {
@@ -90,6 +111,17 @@ func (w *WashStationController) GetAllWashPackages(c echo.Context) error {
 	})
 }
 
+// Admin      godoc
+// @Summary      Get wash package by ID
+// @Description  Retrieve specific wash package data using the wash package id.
+// @Tags         all user
+// @Produce      json
+// @Param 		 id   path      int  true  "Id"
+// @Success      200  {object}  dto.SwaggerResponseGetWashPackageByID
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      404  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /washstations/wash-package/{id} [get]
 func (w *WashStationController) GetWashPackageByID(c echo.Context) error {
 	washPackageID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -113,6 +145,20 @@ func (w *WashStationController) GetWashPackageByID(c echo.Context) error {
 	})
 }
 
+// Admin      godoc
+// @Summary      Update wash package by admin
+// @Description  Updates existing package data specific to the current logged in admin. You will need an 'Authorization' cookie attached with this request.
+// @Tags         admin
+// @Accept       json
+// @Produce      json
+// @Param 		 id   path      int  true  "Id"
+// @param 		request body dto.SwaggerUpdateWashPackageData  true  "Update Wash Package"
+// @Success      200  {object}  dto.SwaggerResponseGetWashPackageByID
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
+// @Failure      404  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /washstations/wash-package/{id} [put]
 func (w *WashStationController) UpdateWashPackage(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {
@@ -168,6 +214,19 @@ func (w *WashStationController) UpdateWashPackage(c echo.Context) error {
 	})
 }
 
+// Admin      godoc
+// @Summary      Delete wash package by admin
+// @Description  Deletes existing package for the current logged in admin. You will need an 'Authorization' cookie attached with this request.
+// @Tags         admin
+// @Accept       json
+// @Produce      json
+// @Param 		 id   path      int  true  "Id"
+// @Success      200  {object}  dto.Response
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
+// @Failure      404  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /washstations/wash-package/{id} [delete]
 func (w *WashStationController) DeleteWashPackage(c echo.Context) error {
 	washPackageID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

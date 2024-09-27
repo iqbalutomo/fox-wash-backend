@@ -2,13 +2,20 @@ package router
 
 import (
 	"api_gateway/controllers"
+	_ "api_gateway/docs"
 	"api_gateway/middlewares"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStationController, oc controllers.OrderController) {
+	e.GET("", func(c echo.Context) error {
+		return c.Redirect(http.StatusTemporaryRedirect, "/swagger/index.html")
+	})
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	users := e.Group("/users")
 	{
 		register := users.Group("/register")
@@ -24,6 +31,7 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		})
 
 		users.POST("/login", uc.Login)
+		users.POST("/logout", uc.Logout, middlewares.Auth)
 	}
 
 	admin := e.Group("/admins")
@@ -40,6 +48,7 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		washstations.GET("/wash-package/:id", wc.GetWashPackageByID)
 		washstations.PUT("/wash-package/:id", wc.UpdateWashPackage)
 		washstations.DELETE("/wash-package/:id", wc.DeleteWashPackage)
+
 		washstations.POST("/detailing-package", wc.CreateDetailingPackage)
 		washstations.GET("/detailing-package/all", wc.GetAllDetailingPackages)
 		washstations.GET("/detailing-package/:id", wc.GetDetailingPackageByID)
@@ -53,6 +62,14 @@ func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStatio
 		users := orders.Group("/users")
 		{
 			users.POST("/orders", oc.CreateOrder)
+			users.GET("/orders", oc.GetUserAllOrders)
+		}
+		washers := orders.Group("/washers")
+		{
+			washers.GET("/orders", oc.GetWasherAllOrders)
+			washers.GET("/orders/:id", oc.WasherGetOrderByID)
+			washers.GET("/orders/ongoing", oc.WasherGetCurrentOrder)
+			washers.PUT("/orders/status/:id", oc.UpdateWasherOrderStatus)
 		}
 	}
 

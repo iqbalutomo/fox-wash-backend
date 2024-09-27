@@ -3,9 +3,9 @@ package utils
 import "net/http"
 
 type ErrResponse struct {
-	Status int    `json:"status"`
-	Type   string `json:"type"`
-	Detail string `json:"detail"`
+	Status int    `json:"status" extensions:"x-order=0"`
+	Type   string `json:"type" extensions:"x-order=1"`
+	Detail string `json:"detail" extensions:"x-order=2"`
 }
 
 var (

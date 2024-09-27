@@ -183,6 +183,17 @@ func (o *OrderController) CreateOrder(ctx context.Context, data *orderpb.CreateO
 	return response, nil
 }
 
+func (o *OrderController) GetUserAllOrders(ctx context.Context, data *orderpb.WasherID) (*orderpb.Orders, error) {
+	ordersTmp, err := o.repo.FindUserAllOrders(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	orders := helpers.AssertOrdersToPb(ordersTmp)
+
+	return &orderpb.Orders{Orders: orders}, nil
+}
+
 func (o *OrderController) CalculateOrder(ctx context.Context, washPackageItems []*orderpb.WashPackageItem, detailingPackageItems []*orderpb.DetailingPackageItem) (dto.OrderCalculateResponse, error) {
 	fee, err := strconv.ParseFloat(os.Getenv("APP_FEE"), 32)
 	if err != nil {
@@ -314,4 +325,48 @@ func (o *OrderController) UpdateOrderPaymentStatus(ctx context.Context, data *or
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (o *OrderController) GetOrderByID(ctx context.Context, data *orderpb.OrderID) (*orderpb.Order, error) {
+	orderTmp, err := o.repo.FindByID(ctx, data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	order := helpers.AssertOrderToPb(orderTmp)
+
+	return order, nil
+}
+
+func (o *OrderController) GetWasherAllOrders(ctx context.Context, data *orderpb.WasherID) (*orderpb.Orders, error) {
+	ordersTmp, err := o.repo.FindWasherAllOrders(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	orders := helpers.AssertOrdersToPb(ordersTmp)
+
+	return &orderpb.Orders{Orders: orders}, nil
+}
+
+func (o *OrderController) GetWasherCurrentOrder(ctx context.Context, data *orderpb.WasherID) (*orderpb.Order, error) {
+	orderTmp, err := o.repo.FindWasherCurrentOrder(ctx, uint(data.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	order := helpers.AssertOrderToPb(orderTmp)
+
+	return order, nil
+}
+
+func (o *OrderController) UpdateWasherOrderStatus(ctx context.Context, data *orderpb.UpdateOrderStatusRequest) (*orderpb.Order, error) {
+	orderTmp, err := o.repo.UpdateWasherOrderStatus(ctx, data.OrderId.Id, uint(data.WasherId.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	order := helpers.AssertOrderToPb(orderTmp)
+
+	return order, nil
 }

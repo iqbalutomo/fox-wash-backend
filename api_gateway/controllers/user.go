@@ -307,6 +307,14 @@ func (u *UserController) WasherActivation(c echo.Context) error {
 	})
 }
 
+// @Summary 	Logout the user
+// @Description Logout the currently authenticated user and clears the authorization cookie
+// @Tags        all user
+// @Accept 		json
+// @Produce 	json
+// @Success 	200 {object} dto.Response
+// @Failure 	500 {object} utils.ErrResponse
+// @Router 		/users/logout [get]
 func (u *UserController) Logout(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	fmt.Println(user)

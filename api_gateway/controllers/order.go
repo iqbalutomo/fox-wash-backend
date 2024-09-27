@@ -90,6 +90,15 @@ func (o *OrderController) CreateOrder(c echo.Context) error {
 	})
 }
 
+// @Summary 	Get all user orders
+// @Description Retrieves all orders for the logged-in user. You will need an 'Authorization' cookie attached with this request.
+// @Tags 		customer
+// @Accept 		json
+// @Produce 	json
+// @Success 	200 {object} dto.SwaggerResponseUserGetAllOrders
+// @Failure 	401 {object} utils.ErrResponse
+// @Failure 	500 {object} utils.ErrResponse
+// @Router 		/users/orders [get]
 func (o *OrderController) GetUserAllOrders(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {

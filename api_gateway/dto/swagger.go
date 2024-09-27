@@ -43,6 +43,11 @@ type SwaggerResponseOrder struct {
 	Data    *orderpb.Order `json:"data" extensions:"x-order=1"`
 }
 
+type SwaggerResponseUserGetAllOrders struct {
+	Message string          `json:"message" extensions:"x-order=0"`
+	Data    *orderpb.Orders `json:"data" extensions:"x-order=1"`
+}
+
 type SwaggerResponseWasherGetAllOrders struct {
 	Message string          `json:"message" extensions:"x-order=0"`
 	Data    *orderpb.Orders `json:"data" extensions:"x-order=1"`

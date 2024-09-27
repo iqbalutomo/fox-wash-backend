@@ -137,6 +137,16 @@ definitions:
         type: string
         x-order: "0"
     type: object
+  dto.SwaggerResponseUserGetAllOrders:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/orderpb.Orders'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
   dto.SwaggerResponseWasherGetAllOrders:
     properties:
       data:
@@ -360,7 +370,7 @@ definitions:
           $ref: '#/definitions/washstationpb.WashPackageCompact'
         type: array
     type: object
-host: 3ee9-103-18-34-211.ngrok-free.app
+host: fox-wash-production-910972720279.asia-southeast2.run.app
 info:
   contact:
     email: muhlisiqbalutomoo@gmail.com
@@ -440,7 +450,50 @@ paths:
       summary: Log in
       tags:
       - all user
+  /users/logout:
+    get:
+      consumes:
+      - application/json
+      description: Logout the currently authenticated user and clears the authorization
+        cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Logout the user
+      tags:
+      - all user
   /users/orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all orders for the logged-in user. You will need an 'Authorization'
+        cookie attached with this request.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseUserGetAllOrders'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get all user orders
+      tags:
+      - customer
     post:
       consumes:
       - application/json

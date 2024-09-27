@@ -95,7 +95,7 @@ func (o *OrderController) GetUserAllOrders(c echo.Context) error {
 	}
 	defer cancel()
 
-	orders, err := o.client.GetWasherAllOrders(ctx, &orderpb.WasherID{Id: uint32(user.ID)})
+	orders, err := o.client.GetUserAllOrders(ctx, &orderpb.WasherID{Id: uint32(user.ID)})
 	if err != nil {
 		return utils.AssertGrpcStatus(err)
 	}

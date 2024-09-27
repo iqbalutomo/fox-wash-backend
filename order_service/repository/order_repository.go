@@ -16,7 +16,7 @@ import (
 
 type Order interface {
 	CreateOrder(ctx context.Context, data *models.Order) error
-	FindUserAllOrders(ctx context.Context, washerID uint) ([]models.Order, error)
+	FindUserAllOrders(ctx context.Context, userID uint) ([]models.Order, error)
 	UpdateOrderPaymentStatus(ctx context.Context, invoiceID, status, method, completeAt string) error
 	FindByID(ctx context.Context, orderID string) (models.Order, error)
 	FindWasherAllOrders(ctx context.Context, washerID uint) ([]models.Order, error)
@@ -42,10 +42,10 @@ func (o *OrderRepository) CreateOrder(ctx context.Context, data *models.Order) e
 	return nil
 }
 
-func (o *OrderRepository) FindUserAllOrders(ctx context.Context, washerID uint) ([]models.Order, error) {
+func (o *OrderRepository) FindUserAllOrders(ctx context.Context, userID uint) ([]models.Order, error) {
 	filter := bson.D{{
 		Key:   "user.id",
-		Value: washerID,
+		Value: userID,
 	}}
 
 	orders, err := o.FindWithFilter(ctx, filter)

@@ -124,7 +124,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/logout": {
+            "get": {
+                "description": "Logout the currently authenticated user and clears the authorization cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Logout the user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/orders": {
+            "get": {
+                "description": "Retrieves all orders for the logged-in user. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get all user orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseUserGetAllOrders"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new order for the logged in user. You will need an 'Authorization' cookie attached with this request.",
                 "consumes": [
@@ -1005,6 +1067,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SwaggerResponseUserGetAllOrders": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Orders"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
         "dto.SwaggerResponseWasherGetAllOrders": {
             "type": "object",
             "properties": {
@@ -1349,7 +1428,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.0.1",
-	Host:             "3ee9-103-18-34-211.ngrok-free.app",
+	Host:             "fox-wash-production-910972720279.asia-southeast2.run.app",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Fox Wash",

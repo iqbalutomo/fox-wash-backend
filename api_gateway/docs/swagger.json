@@ -13,7 +13,7 @@
         },
         "version": "0.0.1"
     },
-    "host": "3ee9-103-18-34-211.ngrok-free.app",
+    "host": "fox-wash-production-910972720279.asia-southeast2.run.app",
     "basePath": "/",
     "paths": {
         "/admins/washer-activation/{email}": {
@@ -118,7 +118,69 @@
                 }
             }
         },
+        "/users/logout": {
+            "get": {
+                "description": "Logout the currently authenticated user and clears the authorization cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all user"
+                ],
+                "summary": "Logout the user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/orders": {
+            "get": {
+                "description": "Retrieves all orders for the logged-in user. You will need an 'Authorization' cookie attached with this request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get all user orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwaggerResponseUserGetAllOrders"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new order for the logged in user. You will need an 'Authorization' cookie attached with this request.",
                 "consumes": [
@@ -993,6 +1055,23 @@
                     "allOf": [
                         {
                             "$ref": "#/definitions/orderpb.Order"
+                        }
+                    ],
+                    "x-order": "1"
+                }
+            }
+        },
+        "dto.SwaggerResponseUserGetAllOrders": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "x-order": "0"
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/orderpb.Orders"
                         }
                     ],
                     "x-order": "1"

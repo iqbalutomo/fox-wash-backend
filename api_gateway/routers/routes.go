@@ -2,13 +2,20 @@ package router
 
 import (
 	"api_gateway/controllers"
+	_ "api_gateway/docs"
 	"api_gateway/middlewares"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func Echo(e *echo.Echo, uc controllers.UserController, wc controllers.WashStationController, oc controllers.OrderController) {
+	e.GET("", func(c echo.Context) error {
+		return c.Redirect(http.StatusTemporaryRedirect, "/swagger/index.html")
+	})
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	users := e.Group("/users")
 	{
 		register := users.Group("/register")

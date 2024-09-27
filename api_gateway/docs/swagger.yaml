@@ -1,0 +1,890 @@
+basePath: /
+definitions:
+  dto.NewOrderDetailingPackageItems:
+    properties:
+      detailing_package_id:
+        type: integer
+      qty:
+        type: integer
+    required:
+    - detailing_package_id
+    type: object
+  dto.NewOrderRequest:
+    properties:
+      address:
+        type: string
+      detailing_package_items:
+        items:
+          $ref: '#/definitions/dto.NewOrderDetailingPackageItems'
+        type: array
+      wash_package_items:
+        items:
+          $ref: '#/definitions/dto.NewOrderWashPackageItems'
+        type: array
+    required:
+    - address
+    - detailing_package_items
+    - wash_package_items
+    type: object
+  dto.NewOrderWashPackageItems:
+    properties:
+      qty:
+        type: integer
+      wash_package_id:
+        type: integer
+    required:
+    - wash_package_id
+    type: object
+  dto.NewWashPackageResponse:
+    properties:
+      category:
+        type: integer
+        x-order: "2"
+      created_by:
+        type: integer
+        x-order: "4"
+      id:
+        type: integer
+        x-order: "0"
+      name:
+        type: string
+        x-order: "1"
+      price:
+        type: number
+        x-order: "3"
+    type: object
+  dto.Response:
+    properties:
+      data:
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerNewWashPackageData:
+    properties:
+      category:
+        type: integer
+        x-order: "1"
+      name:
+        type: string
+        x-order: "0"
+      price:
+        type: number
+        x-order: "2"
+    required:
+    - category
+    - name
+    - price
+    type: object
+  dto.SwaggerResponseGetAllWashPackage:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/washstationpb.WashPackageCompactRepeated'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseGetWashPackageByID:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/washstationpb.WashPackageCompact'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseNewWashPackageByAdmin:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/dto.NewWashPackageResponse'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseOrder:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/orderpb.Order'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseRegister:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseUpdateOrderStatus:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/orderpb.Order'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseWasherGetAllOrders:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/orderpb.Orders'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerResponseWasherGetCurrentOrder:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/orderpb.Order'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SwaggerUpdateWashPackageData:
+    properties:
+      category:
+        type: integer
+        x-order: "1"
+      name:
+        type: string
+        x-order: "0"
+      price:
+        type: number
+        x-order: "2"
+    required:
+    - category
+    - name
+    - price
+    type: object
+  dto.UserLogin:
+    properties:
+      email:
+        type: string
+        x-order: "0"
+      password:
+        type: string
+        x-order: "1"
+    required:
+    - email
+    - password
+    type: object
+  dto.UserRegister:
+    properties:
+      email:
+        type: string
+        x-order: "2"
+      first_name:
+        type: string
+        x-order: "0"
+      last_name:
+        type: string
+        x-order: "1"
+      password:
+        type: string
+        x-order: "3"
+    required:
+    - email
+    - first_name
+    - password
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  orderpb.Address:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  orderpb.DetailingPackage:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      qty:
+        type: integer
+      subtotal:
+        type: number
+    type: object
+  orderpb.Order:
+    properties:
+      address:
+        $ref: '#/definitions/orderpb.Address'
+      created_at:
+        type: string
+      object_id:
+        type: string
+      order_detail:
+        $ref: '#/definitions/orderpb.OrderDetail'
+      payment:
+        $ref: '#/definitions/orderpb.Payment'
+      status:
+        type: string
+      user:
+        $ref: '#/definitions/orderpb.User'
+      washer:
+        $ref: '#/definitions/orderpb.Washer'
+    type: object
+  orderpb.OrderDetail:
+    properties:
+      app_fee:
+        type: number
+      detailing_packages:
+        items:
+          $ref: '#/definitions/orderpb.DetailingPackage'
+        type: array
+      total_price:
+        type: number
+      wash_packages:
+        items:
+          $ref: '#/definitions/orderpb.WashPackage'
+        type: array
+    type: object
+  orderpb.Orders:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/orderpb.Order'
+        type: array
+    type: object
+  orderpb.Payment:
+    properties:
+      invoice_id:
+        type: string
+      invoice_url:
+        type: string
+      method:
+        type: string
+      status:
+        type: string
+      total:
+        type: number
+    type: object
+  orderpb.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  orderpb.WashPackage:
+    properties:
+      category:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      qty:
+        type: integer
+      subtotal:
+        type: number
+    type: object
+  orderpb.Washer:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  utils.ErrResponse:
+    properties:
+      detail:
+        type: string
+        x-order: "2"
+      status:
+        type: integer
+        x-order: "0"
+      type:
+        type: string
+        x-order: "1"
+    type: object
+  washstationpb.WashPackageCompact:
+    properties:
+      category:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  washstationpb.WashPackageCompactRepeated:
+    properties:
+      wash_packages:
+        items:
+          $ref: '#/definitions/washstationpb.WashPackageCompact'
+        type: array
+    type: object
+host: 3ee9-103-18-34-211.ngrok-free.app
+info:
+  contact:
+    email: muhlisiqbalutomoo@gmail.com
+    name: The developer
+  description: Online motorcycle washing service built with microservices that integrates
+    user, washer, and admin.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Fox Wash
+  version: 0.0.1
+paths:
+  /admins/washer-activation/{email}:
+    post:
+      consumes:
+      - application/json
+      description: Activation washer by admin for hired washer as team
+      parameters:
+      - description: Email Washer
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Washer Activation
+      tags:
+      - admin
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login users and embeds a JWt-Auth in cookie
+      parameters:
+      - description: User login details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Log in
+      tags:
+      - all user
+  /users/orders:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order for the logged in user. You will need an 'Authorization'
+        cookie attached with this request.
+      parameters:
+      - description: Order details
+        in: body
+        name: orderRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseOrder'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Create new order
+      tags:
+      - customer
+  /users/register/admin:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the role 'admin'
+      parameters:
+      - description: Admin registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseRegister'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Register a new admin
+      tags:
+      - admin
+  /users/register/user:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the role 'user'
+      parameters:
+      - description: User registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseRegister'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Register a new user
+      tags:
+      - customer
+  /users/register/washer:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the role 'washer'
+      parameters:
+      - description: Washer registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseRegister'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Register a new washer
+      tags:
+      - washer
+  /users/verify/{userid}/{token}:
+    get:
+      consumes:
+      - application/json
+      description: Verify the user registration using unique token sent to the registered
+        email
+      parameters:
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: integer
+      - description: Verification token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Verify user credentials
+      tags:
+      - all user
+  /washers/orders:
+    get:
+      description: Retrieve all orders related to the logged in washer. You will need
+        an 'Authorization' cookie attached with this request.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseWasherGetAllOrders'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get all washer's orders
+      tags:
+      - washer
+  /washers/orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an order by it's ID. You will need an 'Authorization'
+        cookie attached with this request.
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseOrder'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get order by ID
+      tags:
+      - washer
+  /washers/orders/ongoing:
+    get:
+      description: Retrieve ongoing order related to the logged in washer. You will
+        need an 'Authorization' cookie attached with this request.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseWasherGetCurrentOrder'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get current washer's order
+      tags:
+      - washer
+  /washers/orders/status/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates ongoing order status related to the logged in washer. You
+        will need an 'Authorization' cookie attached with this request.
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseUpdateOrderStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Update washer's order
+      tags:
+      - washer
+  /washstations/wash-package:
+    post:
+      consumes:
+      - application/json
+      description: Creates new package data specific to the current logged in admin.
+        You will need an 'Authorization' cookie attached with this request.
+      parameters:
+      - description: Create Wash Package
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SwaggerNewWashPackageData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseNewWashPackageByAdmin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Create wash package for admin
+      tags:
+      - admin
+  /washstations/wash-package/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes existing package for the current logged in admin. You will
+        need an 'Authorization' cookie attached with this request.
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Delete wash package by admin
+      tags:
+      - admin
+    get:
+      description: Retrieve specific wash package data using the wash package id.
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseGetWashPackageByID'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get wash package by ID
+      tags:
+      - all user
+    put:
+      consumes:
+      - application/json
+      description: Updates existing package data specific to the current logged in
+        admin. You will need an 'Authorization' cookie attached with this request.
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Wash Package
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SwaggerUpdateWashPackageData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseGetWashPackageByID'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Update wash package by admin
+      tags:
+      - admin
+  /washstations/wash-package/all:
+    get:
+      description: Retrieve all wash package datas from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwaggerResponseGetAllWashPackage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get all wash package datas
+      tags:
+      - all user
+swagger: "2.0"
